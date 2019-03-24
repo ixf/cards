@@ -1,0 +1,14 @@
+{application, gameserver,
+ [{description, ""},
+  {vsn, "0.1"},
+  {mod, {gameserver_app, []}},
+  {registered, []},
+  {modules, []},
+  {applications, [
+                 kernel
+                 ,stdlib
+                 ,cowboy
+                 ,jiffy
+                 ]},
+  {env, []}
+ ]}.
