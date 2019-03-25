@@ -1,0 +1,37 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+description = """
+Project for AGH IO course.
+
+Project name: ${project.name}
+
+Authors:
+Jakub Czapiga <czapiga@outlook.com>
+Jakub Czerski <jmm.czerski@gmail.com>
+Jakub Gwóźdź <jakub.gwozdz@icloud.com>
+Tomasz Karkocha <karkochat@gmail.com>
+Witold Soczek <witold.soczek@gmail.com>
+Bartosz Sofiński <bartoszsofinsku@gmail.com>
+Julia Żur <?>
+
+"""
+
+group 'pl.agh.edu.io.umniedziala'
+version '1.0-SNAPSHOT'
+mainClassName = 'pl.edu.agh.io.umniedziala.Main'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    
+    // https://github.com/java-native-access/jna
+    implementation 'net.java.dev.jna:jna:5.2.0'
+    implementation 'net.java.dev.jna:jna-platform:5.2.0'
+
+}
