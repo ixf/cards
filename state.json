@@ -1,13 +1,13 @@
-{ "cards" :
+{
+"cards" :
   {
     "1" :
     {
       "pos" : { "x" : 0, "y" : 0 },
       "size" : { "h" : 650, "w" : 477 },
       "img" : "static/images/cards/loot/044Nickel2.png",
-      "rotation" : 0
+      "back" : "static/images/cards/backs/loot.png",
+      "side" : 1
     }
-  },
-  "players" : {},
-  "holds" : {}
+  }
 }

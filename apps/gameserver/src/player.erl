@@ -1,0 +1,73 @@
+
+
+-module(player).
+
+-export([new/3, move/2, getjson/2]).
+-export([default/5, holding/6]).
+
+new(PidWs, Name, Color) ->
+  spawn(player, default, [self(), PidWs, Name, Color, #{<<"x">> => 0, <<"y">> => 0}]).
+
+move(Player, Where) -> Player ! {move, self(), Where}.
+getjson(Player, WhoAsks) -> Player ! {get, WhoAsks}.  
+
+
+
+makejson(Name, Color, Pos) ->
+  {update, 
+        jiffy:encode(#{ <<"action">> => <<"playerjoined">>,
+        <<"params">> =>
+                #{ <<"pos">> => Pos,
+                    <<"name">> => Name,
+                    <<"color">> => Color
+                  }
+        })}.
+
+default(Room, PidWs, Name, Color, Pos) ->
+  receive 
+    {click, Id} ->
+      [{Id, CardPid}] = ets:lookup(cards, Id),
+      card:lift(CardPid, Name),
+      receive 
+        {lift, ok} -> holding(Room, PidWs, Name, Color, Pos, Id);
+        {lift, error} -> default(Room, PidWs, Name, Color, Pos)
+      end;
+    {get, Pid} ->
+      Pid ! makejson(Name, Color, Pos),
+      default(Room, PidWs, Name, Color, Pos);
+    {move, PidWs, Where} ->
+      Update = jiffy:encode( #{<<"action">> => <<"playermoved">>,
+                              <<"params">> => #{ <<"name">> => Name,
+                                               <<"newpos">> => Where} } ),
+      arbiter:broadcast({update, Update}),
+      default(Room, PidWs, Name, Color, Where);
+    leave -> ok;
+    _ ->
+      default(Room, PidWs, Name, Color, Pos)
+  end.
+
+holding(Room, PidWs, Name, Color, Pos, CardId) ->
+  receive 
+    {click, CardId} ->
+      [{CardId, CardPid}] = ets:lookup(cards, CardId),
+      card:drop(CardPid, Name),
+      receive 
+        {drop, ok} -> default(Room, PidWs, Name, Color, Pos);
+        {drop, error} -> holding(Room, PidWs, Name, Color, Pos, CardId)
+      end;
+    {get, Pid} ->
+      Pid ! makejson(Name, Color, Pos),
+      holding(Room, PidWs, Name, Color, Pos, CardId);
+    {move, PidWs, Where} ->
+      Update = jiffy:encode( #{<<"action">> => <<"playermoved">>,
+                              <<"params">> => #{ <<"name">> => Name,
+                                               <<"newpos">> => Where} } ),
+      arbiter:broadcast({update, Update}),
+      holding(Room, PidWs, Name, Color, Where, CardId);
+    leave ->
+      [{CardId, CardPid}] = ets:lookup(cards, CardId),
+      card:drop(CardPid, Name),
+      ok;
+    _ ->
+      default(Room, PidWs, Name, Color, Pos)
+  end.
