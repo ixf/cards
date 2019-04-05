@@ -50,6 +50,11 @@ act("cardclick", Params, {Name, Player}) ->
   Player ! {click, Id},
   ok;
 
+act("rotate", Params, {Name, Player}) ->
+  Id = maps:get(<<"id">>, Params),
+  Player ! {rotate, Id},
+  ok;
+
 act("pos_change", Params, {Name, Player}) ->
   player:move(Player, maps:get(<<"cursor">>, Params)),
   ok;

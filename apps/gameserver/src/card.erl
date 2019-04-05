@@ -2,7 +2,7 @@
 
 -module(card).
 
--export([new/2, new/6, move/2, lift/2, drop/2, getjson/2]).
+-export([new/2, new/6, move/2, lift/2, drop/2, rotate/1, getjson/2]).
 -export([laying/7, moving/8]).
 
 
@@ -24,6 +24,10 @@ getjson(Card, WhoAsks) -> Card ! {get, WhoAsks}.
 move(Card, Where) -> Card ! {move, self(), Where}.
 lift(Card, Name) -> Card ! {lift, self(), Name}.
 drop(Card, Name) -> Card ! {drop, self(), Name}.
+rotate(Card) -> Card ! {rotate, self()}.
+invert(1) -> 0;
+invert(_) -> 1.
+
 
 
 
@@ -54,6 +58,11 @@ laying(Room,Id,Pos,Size,Img,Back,Side) ->
 					       <<"name">> => Name }} ),
       arbiter:broadcast({update, Update}),
       moving(Room,Id,Pos,Size,Img,Back,Side, Pid);
+    leave ->
+      Update = jiffy:encode( #{ <<"action">> => <<"carddel">>,
+				<<"params">> => #{ <<"id">> => Id }} ),
+      arbiter:broadcast({update, Update}),
+      ok;
     {Action, Pid} ->
       Pid ! {Action, error},
       laying(Room,Id,Pos,Size,Img,Back,Side);
@@ -62,7 +71,6 @@ laying(Room,Id,Pos,Size,Img,Back,Side) ->
       laying(Room,Id,Pos,Size,Img,Back,Side)
   end.
 
-
 moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
   receive 
     {get, Pid} ->
@@ -70,9 +78,12 @@ moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
       moving(Room,Id,Pos,Size,Img,Back,Side, Holder);
 
     {move, Holder, NewPos} ->
-      Room ! {moved, Id, NewPos},
-      moving(Room,Id,NewPos,Size,Img,Back,Side, Holder);
-    {move, _NotHolder, NewPos} ->
+
+      Update = jiffy:encode( #{ <<"action">> => <<"cardmove">>,
+			      <<"params">> => #{ <<"id">> => Id,
+					       <<"pos">> => NewPos }} ),
+      arbiter:broadcast({update, Update}),
+
       moving(Room,Id,NewPos,Size,Img,Back,Side, Holder);
 
     {drop, Pid, Name} ->
@@ -82,6 +93,19 @@ moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
 					       <<"name">> => Name }} ),
       arbiter:broadcast({update, Update}),
       laying(Room,Id,Pos,Size,Img,Back,Side);
+
+    {rotate, Holder} ->
+
+      Update = jiffy:encode( #{ <<"action">> => <<"rotate">>,
+			      <<"params">> => #{ <<"id">> => Id }} ),
+      arbiter:broadcast({update, Update}),
+      moving(Room,Id,Pos,Size,Img,Back,invert(Side),Holder);
+
+    leave ->
+      Update = jiffy:encode( #{ <<"action">> => <<"carddel">>,
+				<<"params">> => #{ <<"id">> => Id }} ),
+      arbiter:broadcast({update, Update}),
+      ok;
 
     {Action, Pid, _} ->
       Pid ! {Action, error},

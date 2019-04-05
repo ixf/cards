@@ -18,12 +18,14 @@ init(_Args) ->
   ets:new(cards, [set, named_table]),
   ets:new(players, [set, named_table]),
 
-  {ok, StateFile} = file:read_file("state.json"),
-  State = jiffy:decode( binary:bin_to_list( StateFile ), [return_maps]),
-  init_cards(maps:get(<<"cards">>, State)),
-
+  setup_state(),
   {ok, running}.
 
+
+setup_state() ->
+  {ok, StateFile} = file:read_file("state.json"),
+  State = jiffy:decode( binary:bin_to_list( StateFile ), [return_maps]),
+  init_cards(maps:get(<<"cards">>, State)).
 
 init_cards(M) ->
   I = maps:iterator(M),
@@ -99,6 +101,12 @@ handle_call({bye, Name}, _From, State) ->
 
 
 
+handle_info(restate, State) ->
+  ets:foldl(fun({Id, Pid}, Acc) -> 
+		Pid ! leave
+	    end, acc, cards),
+  setup_state(),
+  {noreply, State};
 
 handle_info(info, State) ->
   io:format("~w~n", [State]),

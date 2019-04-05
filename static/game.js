@@ -166,8 +166,8 @@ var holds = []; // name : card id
 
 // ### scene setup
 
-const width = 1280;
-const height = 720;
+const width = 1600;
+const height = 900;
 
 var scene = new THREE.Scene();
 var extra_scene = new THREE.Scene();
@@ -268,11 +268,9 @@ document.addEventListener('keydown', function(event) {
     case 'f':
       if(card != undefined){
 	if(card.canFlip()){
-	  card.startFlip();
 	  ws.send(JSON.stringify({action:'rotate', params: {'id': card.id}})); 
 	}
       }
-      // TODO send flip
       break;
   }
 
@@ -282,7 +280,7 @@ document.addEventListener('keydown', function(event) {
 
 // ### websocket setup
 
-var ws = new WebSocket("ws://localhost:8080/game/" + player_name + "/" + cursor_color);
+var ws = new WebSocket("ws://" + window.location.hostname + ":8080/game/" + player_name + "/" + cursor_color);
 
 ws.onopen = function(event) {
   //ws.send(JSON.stringify({action:'givestate', params: {}}));
@@ -314,6 +312,10 @@ ws.addEventListener('message', function (event) {
       var clicked = cards[obj.params.id];
       clicked.click(1);
       holds[player] = clicked;
+      break;
+
+    case "rotate":
+      cards[obj.params.id].startFlip();
       break;
 
     case "newcard":

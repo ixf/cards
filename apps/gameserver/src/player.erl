@@ -63,11 +63,17 @@ holding(Room, PidWs, Name, Color, Pos, CardId) ->
                               <<"params">> => #{ <<"name">> => Name,
                                                <<"newpos">> => Where} } ),
       arbiter:broadcast({update, Update}),
+      [{CardId, CardPid}] = ets:lookup(cards, CardId),
+      card:move(CardPid, Pos),
       holding(Room, PidWs, Name, Color, Where, CardId);
+    {rotate, CardId} ->
+      [{CardId, CardPid}] = ets:lookup(cards, CardId),
+      card:rotate(CardPid),
+      holding(Room, PidWs, Name, Color, Pos, CardId);
     leave ->
       [{CardId, CardPid}] = ets:lookup(cards, CardId),
       card:drop(CardPid, Name),
       ok;
     _ ->
-      default(Room, PidWs, Name, Color, Pos)
+      holding(Room, PidWs, Name, Color, Pos, CardId)
   end.
