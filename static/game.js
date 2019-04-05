@@ -155,7 +155,7 @@ class Cursor {
 
     this.blockers = [];
 
-    var map = new THREE.TextureLoader().load( "static/images/cursor.png" );
+    var map = new THREE.TextureLoader().load( "static/cursor.png" );
     var material = new THREE.SpriteMaterial( { map: map, color: color } );
     this.sprite = new THREE.Sprite( material );
     this.sprite.position.set(-40, 0, 800);

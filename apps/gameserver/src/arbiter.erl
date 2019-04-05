@@ -144,10 +144,8 @@ handle_info({eyes, Name}, State) ->
   Open = {update, jiffy:encode( #{ <<"action">> => <<"eyes_open">> } ) },
   Close = {update, jiffy:encode( #{ <<"action">> => <<"eyes_closed">> } ) },
   ets:foldl(fun({Found, Ws, _Player}, _Acc) when Found == Name -> 
-		io:format("open: ~s~n", [Name]),
 		   Ws ! Open;
 	       ({Other, Ws, _Player}, _Acc) ->
-		io:format("close: ~s~n", [Name]),
 		  Ws ! Close
 	    end, acc, players),
   {noreply, State};
