@@ -342,8 +342,8 @@ document.addEventListener('keydown', function(event) {
 	let index = Math.floor(Math.random() * all_valid.length);
 	let id = all_valid[index];
 	let card = cards[id];
-	ws.send(JSON.stringify({action:'cardclick', params: {id: id}}));
 	ws.send(JSON.stringify({action:'random_choice', params: {name: player_name, cat: card.cat }}));
+	ws.send(JSON.stringify({action:'cardclick', params: {id: id}}));
       }
 
       break;
@@ -389,6 +389,8 @@ function chatlog(txt){
 
 
 var onJoin = {};
+var eyes_mode = false;
+
 ws.addEventListener('message', function (event) {
   var obj = JSON.parse(event.data)
   var action = obj.action;
@@ -404,6 +406,9 @@ ws.addEventListener('message', function (event) {
     case "cardup":
       var player = obj.params.name;
       var clicked = cards[obj.params.id];
+      if(eyes_mode){
+	chatlog(player + " podnosi karte. kategoria " + clicked.cat);
+      }
       clicked.click(1);
       holds[player] = clicked;
       break;
@@ -476,10 +481,12 @@ ws.addEventListener('message', function (event) {
       break;
 
     case "eyes_closed":
+      eyes_mode = true;
       canvas.style.display = "none";
       break;
 
     case "eyes_open":
+      eyes_mode = false;
       canvas.style.display = "block";
       break;
 
