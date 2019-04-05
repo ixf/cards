@@ -1,0 +1,29 @@
+{
+"cards" :
+  {
+    "1" :
+    {
+      "pos" : { "x" : 0, "y" : 0 },
+      "size" : { "h" : 455, "w" : 334},
+      "img" : "static/isaac/images/cards/loot/001OneCent1 copy.png",
+      "back" : "static/isaac/images/cards/backs/loot.png",
+      "side" : 1
+    },
+    "2" :
+    {
+      "pos" : { "x" : -500, "y" : 0 },
+      "size" : { "h" : 455, "w" : 334},
+      "img" : "static/isaac/images/cards/loot/044Nickel2.png",
+      "back" : "static/isaac/images/cards/backs/loot.png",
+      "side" : 1
+    },
+    "3" :
+    {
+      "pos" : { "x" : 500, "y" : 0 },
+      "size" : { "h" : 455, "w" : 334 },
+      "img" : "static/isaac/images/cards/loot/002OneCent2 copy.png",
+      "back" : "static/isaac/images/cards/backs/loot.png",
+      "side" : 1
+    }
+  }
+}

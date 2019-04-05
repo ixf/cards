@@ -17,6 +17,7 @@ init(_Args) ->
 
   ets:new(cards, [set, named_table]),
   ets:new(players, [set, named_table]),
+  ets:new(blockers, [bag, named_table]),
 
   setup_state(),
   {ok, running}.
@@ -56,6 +57,32 @@ broadcast(What) ->
 
 handle_call({hello, Name, Color}, {Pid, _Tag}, State) ->
 
+  case ets:lookup(players, Name) of
+    [] ->
+      ThisPlayer = setup_player(Name, Color, Pid), 
+      {reply, {ok,ThisPlayer}, State};
+    _ ->
+      {reply, {error,<<"taken">>}, State}
+  end;
+
+
+handle_call({bye, Name}, _From, State) ->
+  io:format("player left: ~s~n", [Name]),
+
+  Update = jiffy:encode(#{ <<"action">> => <<"playerleft">>,
+			   <<"params">> => #{ <<"name">> => Name } }),
+  broadcast({update, Update}),
+  
+  case ets:lookup(players, Name) of
+    [] -> {noreply, State};
+    [{Name, Ws, Player}] ->
+      ets:delete(players, Name),
+      Player ! leave,
+      {reply, ok, State}
+  end.
+
+
+setup_player(Name, Color, Pid) ->
   ThisPlayer = player:new(Pid, Name, Color),
 
   io:format("player joins: ~s~n", [Name]),
@@ -82,26 +109,52 @@ handle_call({hello, Name, Color}, {Pid, _Tag}, State) ->
 		acc
 	    end, acc, players),
 
-  {reply, {ok,ThisPlayer}, State};
-
-
-handle_call({bye, Name}, _From, State) ->
-  io:format("player left: ~s~n", [Name]),
-
-  Update = jiffy:encode(#{ <<"action">> => <<"playerleft">>,
-			   <<"params">> => #{ <<"name">> => Name } }),
-  broadcast({update, Update}),
-  
-  [{Name, Ws, Player}] = ets:lookup(players, Name),
-  ets:delete(players, Name),
-  Player ! leave,
-
-  {reply, ok, State}.
+  % inform the player about existing blockers
+  ets:foldl(fun({_,Blocker}, Acc) ->
+		Pid ! {update, Blocker},
+		acc
+	    end, acc, blockers),
+  ThisPlayer.
 
 
 
+handle_info({blocker, X, Y, W, H, Owner}, State) ->
+  Update = jiffy:encode(#{ <<"action">> => <<"blockernew">>,
+			  <<"params">> => #{
+			      <<"owner">> => Owner,
+			      <<"size">> => #{
+				  <<"x">> => X,
+				  <<"y">> => Y,
+				  <<"w">> => W,
+				  <<"h">> => H
+				 } } }),
+  ets:insert(blockers, {1, Update}),
+  broadcast({update,Update}),
+  {noreply, State};
+
+handle_info(clear, State) ->
+  broadcast( {update, jiffy:encode( #{ <<"action">> => <<"clear_chatlog">> } ) }),
+  {noreply, State};
+
+handle_info(eyes_open, State) ->
+  broadcast( {update, jiffy:encode( #{ <<"action">> => <<"eyes_open">> } ) }),
+  {noreply, State};
+
+handle_info({eyes, Name}, State) ->
+  Open = {update, jiffy:encode( #{ <<"action">> => <<"eyes_open">> } ) },
+  Close = {update, jiffy:encode( #{ <<"action">> => <<"eyes_closed">> } ) },
+  ets:foldl(fun({Found, Ws, _Player}, _Acc) when Found == Name -> 
+		io:format("open: ~s~n", [Name]),
+		   Ws ! Open;
+	       ({Other, Ws, _Player}, _Acc) ->
+		io:format("close: ~s~n", [Name]),
+		  Ws ! Close
+	    end, acc, players),
+  {noreply, State};
 
 handle_info(restate, State) ->
+  ets:delete(blockers),
+  ets:new(blockers, [bag, named_table]),
   ets:foldl(fun({Id, Pid}, Acc) -> 
 		Pid ! leave
 	    end, acc, cards),

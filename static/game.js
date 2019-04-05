@@ -16,8 +16,9 @@ class Size {
 
 class Card {
 
-  constructor (id, frontimg, backimg, Size, side) {
+  constructor (id, cat, frontimg, backimg, Size, side) {
     this.id = id;
+    this.cat = cat;
     this.Size = Size;
 
     this.state = 0;
@@ -61,7 +62,7 @@ class Card {
   }
 
   setPos(pos){
-    this.group.position.set(pos.x, pos.y, 0);
+    this.group.position.set(pos.x, pos.y, parseInt(this.id));
   }
 
   canFlip(){
@@ -91,6 +92,32 @@ class Card {
     }, frames_total * frames_time);
   }
 
+  remove(){
+    scene[this.group].remove();
+  }
+
+}
+
+class Blocker { 
+
+  constructor(Size, owner){
+    this.size = Size;
+    this.owner = owner;
+    let color = cursors[owner].color;
+
+    this.opacity = (owner == player_name ? 0.2 : 1.0);
+
+    var geometry = new THREE.PlaneGeometry( Size.w, Size.h, 1 );
+    var material = new THREE.MeshBasicMaterial( {color: color, opacity: this.opacity, transparent: true, side: THREE.DoubleSide} );
+    this.plane = new THREE.Mesh( geometry, material );
+    this.plane.position.set(Size.x,Size.y,600);
+    this.plane.owner_player = owner;
+    scene.add( this.plane );
+  }
+
+  remove(){
+    scene.remove(this.plane);
+  }
 }
 
 class Text{
@@ -106,14 +133,14 @@ class Text{
 
     context.fillStyle = "white";
     context.strokeStyle = "black";
+    context.lineWidth = 10;
+    context.strokeText( text, 0, fontsize );
     context.fillText( text, 0, fontsize );
-    context.strokeText( text, 0, fontsize);
 
     var texture = new THREE.Texture(canvas) 
     texture.needsUpdate = true;
 
-    var spriteMaterial = new THREE.SpriteMaterial( 
-      { map: texture } );
+    var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
     this.sprite = new THREE.Sprite( spriteMaterial );
 
     this.sprite.scale.set(128,72,1.0);
@@ -124,24 +151,26 @@ class Cursor {
 
   constructor(name, x, y, color){
     this.name = name;
-		this.color = color;
+    this.color = color;
+
+    this.blockers = [];
 
     var map = new THREE.TextureLoader().load( "static/images/cursor.png" );
     var material = new THREE.SpriteMaterial( { map: map, color: color } );
     this.sprite = new THREE.Sprite( material );
-    this.sprite.position.set(-40, 0, 90);
+    this.sprite.position.set(-40, 0, 800);
     this.sprite.scale.set(40, 40, 1);
 
     this.sprite.thisis = "cursor";
 
     this.text = new Text(name);
-    this.text.sprite.position.set(0,0, 90);
+    this.text.sprite.position.set(0,0, 800);
   }
 
   setPos(mouse){
     this.pos = {x: mouse.x, y: mouse.y };
-    this.sprite.position.set(mouse.x, mouse.y, 90);
-    this.text.sprite.position.set(mouse.x+80,mouse.y-40, 90);
+    this.sprite.position.set(mouse.x, mouse.y, 800);
+    this.text.sprite.position.set(mouse.x+80,mouse.y-40, 800);
   }
 }
 
@@ -173,12 +202,22 @@ var scene = new THREE.Scene();
 var extra_scene = new THREE.Scene();
 extra_scene.add(scene);
 var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 0.1, 1000 );
+var total_offset = {x: 0, y:0};
+
+function offset_camera(x, y){
+  total_offset.x += x;
+  total_offset.y += y;
+  camera.position.x = total_offset.x;
+  camera.position.y = total_offset.y;
+}
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( width, height );
 var canvas = renderer.domElement;
 document.body.appendChild( renderer.domElement );
-camera.position.z = 100;
+camera.position.z = 900;
+
+
 
 
 // ### player setup
@@ -188,7 +227,7 @@ var mouse = new THREE.Vector2();
 var rel_mouse = new THREE.Vector2();
 
 function loadCard(key, cardInfo){
-  let card = new Card(key, cardInfo.img, cardInfo.back, cardInfo.size, cardInfo.side);
+  let card = new Card(key, cardInfo.cat, cardInfo.img, cardInfo.back, cardInfo.size, cardInfo.side);
   card.setPos(cardInfo.pos);
   cards[key] = card;
   scene.add(card.group);
@@ -225,13 +264,14 @@ function loadCursors(players){
 }
 
 
+
 canvas.addEventListener('mousemove', function(event){
   var rect = canvas.getBoundingClientRect();
   var x = event.clientX - rect.left;
   var y = event.clientY - rect.top;
 
-  rel_mouse.x = x - width / 2 + 20;
-  rel_mouse.y = - y + height / 2 - 20;
+  rel_mouse.x = x - width / 2 + 20 + total_offset.x;
+  rel_mouse.y = - y + height / 2 - 20 + total_offset.y;
 
   mouse.x = ( x / width ) * 2 - 1;
   mouse.y = - ( y / height ) * 2 + 1;
@@ -251,18 +291,22 @@ canvas.addEventListener('mousedown',
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObjects( scene.children, true );
 
-    console.log(intersects);
-    if(intersects.length > 0){
-      var selected = intersects[0];
-      console.log(selected);
-      ws.send(JSON.stringify({action:'cardclick', params: {id: selected.object.card.id}}));
+    for(var key in intersects){
+      let selected = intersects[key];
+
+      if(selected.object.owner_player != undefined){
+	if(selected.object.owner_player != player_name)
+	  break;
+      } else if("card" in selected.object){
+	ws.send(JSON.stringify({action:'cardclick', params: {id: selected.object.card.id}}));
+	break;
+      }
     }
 
-  } , false);
+  } );
 
 
 document.addEventListener('keydown', function(event) {
-  console.log("Keydown: " + event.key);
   var card = holds[player_name];
   switch(event.key){
     case 'f':
@@ -272,7 +316,53 @@ document.addEventListener('keydown', function(event) {
 	}
       }
       break;
+    case 'r':
+      // wybieranie losowe:
+      // tymczasowe, zanim dodane beda stosy i tasowanie
+      if(player_name in holds){
+	break;
+      }
+
+      raycaster.setFromCamera(mouse, camera);
+      var intersects = raycaster.intersectObjects( scene.children, true );
+
+      var all_valid = [];
+      for(var key in intersects){
+	let selected = intersects[key];
+
+	if(selected.object.owner_player != undefined){
+	  if(selected.object.owner_player != player_name)
+	    break;
+	} else if("card" in selected.object){
+	  all_valid.push(selected.object.card.id);
+	}
+      }
+
+      if(all_valid.length > 0){
+	let index = Math.floor(Math.random() * all_valid.length);
+	let id = all_valid[index];
+	let card = cards[id];
+	ws.send(JSON.stringify({action:'cardclick', params: {id: id}}));
+	ws.send(JSON.stringify({action:'random_choice', params: {name: player_name, cat: card.cat }}));
+      }
+
+      break;
+    case 'ArrowDown':
+      offset_camera(0, -50);
+      break;
+    case 'ArrowUp':
+      offset_camera(0, 50);
+      break;
+    case 'ArrowLeft':
+      offset_camera(-50,0);
+      break;
+    case 'ArrowRight':
+      offset_camera(50,0);
+      break;
   }
+
+
+  canvas.focus();
 
 });
 
@@ -293,13 +383,18 @@ ws.onopen = function(event) {
   }, 16);
 };
 
+function chatlog(txt){
+  document.getElementById("chatlog").innerHTML += "<br>" + txt;
+}
+
+
+var onJoin = {};
 ws.addEventListener('message', function (event) {
   var obj = JSON.parse(event.data)
   var action = obj.action;
 
   switch(action){
     case "carddown":
-      console.log("carddown", obj);
       var player = obj.params.name;
       var clicked = cards[obj.params.id];
       clicked.click(0);
@@ -307,7 +402,6 @@ ws.addEventListener('message', function (event) {
       break;
 
     case "cardup":
-      console.log("cardup", obj);
       var player = obj.params.name;
       var clicked = cards[obj.params.id];
       clicked.click(1);
@@ -322,24 +416,46 @@ ws.addEventListener('message', function (event) {
       cards.push( loadCard(obj.params.id, obj.params) )
       break;
 
-    case "state":
-      cards = [];
-      cursors = [];
-      console.log("obj:", obj);
-      //loadCards(obj.params.cards);
-      loadCursors(obj.params.players);
+    case "delcard":
+      cards[obj.params.id].remove();
+      delete cards[obj.params.id];
+      break;
+
+    case "blockernew":
+      let owner = obj.params.owner;
+      let size = obj.params.size;
+      if ( owner in cursors ){
+	cursors[owner].blockers.push( new Blocker(size, owner) );
+      } else {
+	if(onJoin[owner] == undefined){
+	  onJoin[owner] = [];
+	}
+	onJoin[owner].push(function() {
+	  cursors[owner].blockers.push( new Blocker(size, owner) );
+	});
+      }
+      
+      break;
+
+    case "cardmove":
+      // todo
       break;
 
     case "playerjoined":
-      console.log(obj);
       loadNewCursor(obj.params);
+      chatlog(obj.params.name + " dołączył" );
+      if( obj.params.name in onJoin ){
+	onJoin[obj.params.name].forEach( (f) => f() );
+	delete onJoin[obj.params.name];
+      }
       break;
 
     case "playerleft":
-      console.log(obj);
       let c = cursors[obj.params.name];
+      chatlog(obj.params.name + " zwiał" );
       extra_scene.remove(c.sprite);
       extra_scene.remove(c.text.sprite);
+      c.blockers.forEach( (b) => b.remove() );
       delete cursors[obj.params.name];
       break;
 
@@ -349,6 +465,22 @@ ws.addEventListener('message', function (event) {
         var card = holds[obj.params.name];
         card.setPos(obj.params.newpos);
       }
+      break;
+
+    case "clear_chatlog":
+      document.getElementById("chatlog").innerHTML = "witaj w ulica karasiowa the gaem";
+      break;
+
+    case "random_choice":
+      chatlog(obj.params.name + " losuje! kategoria " + obj.params.cat);
+      break;
+
+    case "eyes_closed":
+      canvas.style.display = "none";
+      break;
+
+    case "eyes_open":
+      canvas.style.display = "block";
       break;
 
     default:
@@ -362,7 +494,7 @@ window.onbeforeunload = function() {
 };
 
 
-renderer.setClearColor(0x9e6a8c);
+renderer.setClearColor(0x493a4c);
 animate();
 
 function animate() {
@@ -370,3 +502,4 @@ function animate() {
   // var timer = Date.now() * 0.0001;
   renderer.render( extra_scene, camera );
 }
+

@@ -2,20 +2,21 @@
 
 -module(card).
 
--export([new/2, new/6, move/2, lift/2, drop/2, rotate/1, getjson/2]).
--export([laying/7, moving/8]).
+-export([new/2, new/3, move/2, lift/2, drop/2, rotate/1, getjson/2]).
+-export([laying/3, moving/4]).
 
 
 new(Id, Map) ->
+  Cat = maps:get(<<"cat">>, Map),
   Pos = maps:get(<<"pos">>, Map),
   Size = maps:get(<<"size">>, Map),
   Img = maps:get(<<"img">>, Map),
   Back = maps:get(<<"back">>, Map),
   Side  = maps:get(<<"side">>, Map),
-  new(Id, Pos, Size, Img, Back, Side).
+  new({Id, Cat, Size, Img, Back}, Pos, Side).
 
-new(Id, Pos, Size, Img, Back, Side) ->
-  spawn(card, laying, [self(), Id,Pos,Size,Img, Back, Side]).
+new(Attrs, Pos, Side) ->
+  spawn(card, laying, [Attrs, Pos, Side]).
 
 % WhoAsks jest zamiast self() bo bedzie to moze robic room zamist
 % procesu gracza
@@ -32,10 +33,11 @@ invert(_) -> 1.
 
 
 
-makejson(Id,Pos,Size,Img,Back,Side,State) ->
+makejson({Id,Cat,Size,Img,Back},Pos,Side,State) ->
   {update, jiffy:encode( #{ <<"action">> => <<"newcard">>,
   <<"params">> => #{
        <<"id">> => Id,
+		   <<"cat">> => Cat,
 		   <<"pos">> => Pos,
 		   <<"size">> => Size,
 		   <<"img">> => Img,
@@ -46,18 +48,18 @@ makejson(Id,Pos,Size,Img,Back,Side,State) ->
      }
     )}.
 
-laying(Room,Id,Pos,Size,Img,Back,Side) ->
+laying(Attrs={Id,_,_,_,_}, Pos, Side) ->
   receive 
     {get, Pid} ->
-      Pid ! makejson(Id, Pos, Size, Img, Back, Side, 0),
-      laying(Room,Id,Pos,Size,Img,Back,Side);
+      Pid ! makejson(Attrs, Pos, Side, 0),
+      laying(Attrs,Pos,Side);
     {lift, Pid, Name} ->
       Pid ! {lift, ok},
       Update = jiffy:encode( #{ <<"action">> => <<"cardup">>,
 			      <<"params">> => #{ <<"id">> => Id,
 					       <<"name">> => Name }} ),
       arbiter:broadcast({update, Update}),
-      moving(Room,Id,Pos,Size,Img,Back,Side, Pid);
+      moving(Attrs, Pos, Side, Pid);
     leave ->
       Update = jiffy:encode( #{ <<"action">> => <<"carddel">>,
 				<<"params">> => #{ <<"id">> => Id }} ),
@@ -65,17 +67,17 @@ laying(Room,Id,Pos,Size,Img,Back,Side) ->
       ok;
     {Action, Pid} ->
       Pid ! {Action, error},
-      laying(Room,Id,Pos,Size,Img,Back,Side);
+      laying(Attrs,Pos,Side);
     {Action, Pid, _} ->
       Pid ! {Action, error},
-      laying(Room,Id,Pos,Size,Img,Back,Side)
+      laying(Attrs,Pos,Side)
   end.
 
-moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
+moving(Attrs={Id,_,_,_,_},Pos,Side,Holder) ->
   receive 
     {get, Pid} ->
-      Pid ! makejson(Id, Pos, Size, Img, Back, Side, 1),
-      moving(Room,Id,Pos,Size,Img,Back,Side, Holder);
+      Pid ! makejson(Attrs, Pos, Side, 1),
+      moving(Attrs, Pos, Side, Holder);
 
     {move, Holder, NewPos} ->
 
@@ -84,7 +86,7 @@ moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
 					       <<"pos">> => NewPos }} ),
       arbiter:broadcast({update, Update}),
 
-      moving(Room,Id,NewPos,Size,Img,Back,Side, Holder);
+      moving(Attrs, NewPos, Side, Holder);
 
     {drop, Pid, Name} ->
       Pid ! {drop, ok},
@@ -92,14 +94,14 @@ moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
 			      <<"params">> => #{ <<"id">> => Id,
 					       <<"name">> => Name }} ),
       arbiter:broadcast({update, Update}),
-      laying(Room,Id,Pos,Size,Img,Back,Side);
+      laying(Attrs, Pos, Side);
 
     {rotate, Holder} ->
 
       Update = jiffy:encode( #{ <<"action">> => <<"rotate">>,
 			      <<"params">> => #{ <<"id">> => Id }} ),
       arbiter:broadcast({update, Update}),
-      moving(Room,Id,Pos,Size,Img,Back,invert(Side),Holder);
+      moving(Attrs, Pos, invert(Side), Holder);
 
     leave ->
       Update = jiffy:encode( #{ <<"action">> => <<"carddel">>,
@@ -109,9 +111,9 @@ moving(Room,Id,Pos,Size,Img,Back,Side,Holder) ->
 
     {Action, Pid, _} ->
       Pid ! {Action, error},
-      moving(Room,Id,Pos,Size,Img,Back,Side, Holder);
+      moving(Attrs,Pos, Side, Holder);
     {Action, Pid} ->
       Pid ! {Action, error},
-      moving(Room,Id,Pos,Size,Img,Back,Side, Holder)
+      moving(Attrs,Pos, Side, Holder)
   end.
 

@@ -8,14 +8,6 @@
 -export([terminate/3]).
 
 
-% a player joins -> init, websocket_init
-% this calls arbiter:hello with name and color ( from http get params )
-% a player then sends a {givestate, ...} with all other players and cards
-%
-% every arbiter call informs other players about the changes
-%
-% the initial state is taken from the arbiter
-
 
 
 
@@ -27,9 +19,13 @@ init(Req, State) ->
   {cowboy_websocket, Req, {Name,Color}, Opts}.
 
 websocket_init({Name,Color}) ->
-  {ok, Player} = arbiter:hello(Name, Color),
-  {ok, {Name,Player}}.
-
+  case arbiter:hello(Name, Color) of
+    {ok, Player} -> {ok, {Name,Player}};
+    {error, Reason} ->
+      Response = jiffy:encode( #{ <<"action">> => <<"failed">>,
+				<<"params">> => Reason } ),
+      {stop, {text, Response}}
+  end.
 
 
 websocket_handle({text, Json}, State) ->
@@ -48,6 +44,11 @@ respond(Response, State) -> {reply, Response, State}.
 act("cardclick", Params, {Name, Player}) ->
   Id = maps:get(<<"id">>, Params),
   Player ! {click, Id},
+  ok;
+
+act("random_choice", Params, {Name, Player}) ->
+  Update = jiffy:encode( #{ <<"action">> => <<"random_choice">>, <<"params">> => Params } ),
+  arbiter:broadcast({update, Update}),
   ok;
 
 act("rotate", Params, {Name, Player}) ->
