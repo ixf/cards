@@ -1,9 +1,30 @@
-package pl.agh.edu.io.umniedziala;
+package pl.edu.agh.io.umniedziala;
 
-public class Main {
-    public static void main(String[] args) {
+import javafx.application.Application;
+import javafx.stage.Stage;
+import pl.edu.agh.io.umniedziala.viewController.AppController;
 
-        System.out.printf("Hello world");
+import java.io.IOException;
+
+public class Main extends Application {
+
+    private Stage primaryStage;
+
+    private AppController appController;
+
+    @Override
+    public void start(Stage primaryStage) throws IOException {
+        this.primaryStage = primaryStage;
+        this.primaryStage.setTitle("WorkMonitor");
+
+        this.appController = new AppController(primaryStage);
+        this.appController.initRootLayout();
 
     }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+
 }
