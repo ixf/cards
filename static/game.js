@@ -220,6 +220,8 @@ camera.position.z = 900;
 
 
 
+
+
 // ### player setup
 
 var raycaster = new THREE.Raycaster();
@@ -361,9 +363,7 @@ document.addEventListener('keydown', function(event) {
       break;
   }
 
-
   canvas.focus();
-
 });
 
 
@@ -373,7 +373,6 @@ document.addEventListener('keydown', function(event) {
 var ws = new WebSocket("ws://" + window.location.hostname + ":8080/game/" + player_name + "/" + cursor_color);
 
 ws.onopen = function(event) {
-  //ws.send(JSON.stringify({action:'givestate', params: {}}));
 
   setInterval(function(){
     if(ws.readyState < 2)
@@ -384,7 +383,9 @@ ws.onopen = function(event) {
 };
 
 function chatlog(txt){
-  document.getElementById("chatlog").innerHTML += "<br>" + txt;
+  let b = document.getElementById("chatlog");
+  b.innerHTML += "<br>" + txt;
+  b.scrollTop = b.scrollHeight;
 }
 
 
@@ -460,7 +461,7 @@ ws.addEventListener('message', function (event) {
       chatlog(obj.params.name + " zwiał" );
       extra_scene.remove(c.sprite);
       extra_scene.remove(c.text.sprite);
-      c.blockers.forEach( (b) => b.remove() );
+      // c.blockers.forEach( (b) => b.remove() );
       delete cursors[obj.params.name];
       break;
 
@@ -473,6 +474,7 @@ ws.addEventListener('message', function (event) {
       break;
 
     case "clear_chatlog":
+      document.getElementById("chatlog").style.display = "none";
       document.getElementById("chatlog").innerHTML = "witaj w ulica karasiowa the gaem";
       break;
 
@@ -490,10 +492,29 @@ ws.addEventListener('message', function (event) {
       canvas.style.display = "block";
       break;
 
+    case "chat":
+      chatlog(obj.params.name + "> " + obj.params.text);
+      break;
+
     default:
       console.log('weird msg from server ', obj);
   }
 });
+
+
+window.onload = function () {
+  var chatbox = document.getElementById("chatbox");
+  var chathistory = document.getElementById("chatlog");
+  chatbox.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      chathistory.style.display = 'block';
+      ws.send(JSON.stringify({action:'chat', params: { name: player_name, text: chatbox.value }}));
+      chatbox.value = "";
+    }
+  });
+};
+
 
 window.onbeforeunload = function() {
   ws.onclose = function () {};

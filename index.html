@@ -20,19 +20,31 @@
 		background-color: black;
 	    }
 	    canvas {
+		tabindex: 1;
 		border: 1px solid white;
 		cursor: none;
 		float: left;
 	    }
-	    #chatlog {
+	    #chatcontainer {
 		float: right;
+	    }
+	    #chatlog {
 		color: white;
+		height: 600px;
+		width: 300px;
+		overflow: auto;
+
+		display: none;
 	    }
 	</style>
     </head>
     <body>
 	<script src="static/three.js"></script>
 	<script src="static/game.js"></script>
-	<div id="chatlog">witaj w ulica karasiowa the gaem</div>
+	<div id="chatcontainer">
+	    <div id="chatlog">witaj w ulica karasiowa the gaem</div>
+	    <input id="chatbox">
+	</div>
+	
     </body>
 </html>

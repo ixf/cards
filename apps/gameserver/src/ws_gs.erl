@@ -60,6 +60,12 @@ act("pos_change", Params, {Name, Player}) ->
   player:move(Player, maps:get(<<"cursor">>, Params)),
   ok;
 
+act("chat", Params, {Name, Player}) ->
+  Update = jiffy:encode( #{ <<"action">> => <<"chat">>,
+			    <<"params">> => Params } ),
+  arbiter:broadcast({update, Update}),
+  ok;
+
 act(Action, _Params, _Player) ->
   io:format("niewiem co to: ~s~n", [Action]),
   ok.
