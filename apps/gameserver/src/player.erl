@@ -15,7 +15,7 @@ getjson(Player, WhoAsks) -> Player ! {get, WhoAsks}.
 
 makejson(Name, Color, Pos) ->
   {update, 
-        jiffy:encode(#{ <<"action">> => <<"playerjoined">>,
+        jiffy:encode(#{ <<"action">> => <<"new_player">>,
         <<"params">> =>
                 #{ <<"pos">> => Pos,
                     <<"name">> => Name,

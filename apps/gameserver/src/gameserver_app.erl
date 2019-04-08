@@ -11,7 +11,8 @@ start(_Type, _Args) ->
 				      [
 				       {"/", cowboy_static, {file, "index.html"}},
 				       {"/game/:id/:color", ws_gs, #{} },
-				       {"/static/[...]", cowboy_static, {dir, "static"}}
+				       {"/static/[...]", cowboy_static, {dir, "static"}},
+				       {"/favicon.ico", cowboy_static, {file, "favicon.ico"}}
 				      ]} ]),
   {ok, _} = cowboy:start_clear(http, [{port, 8080}], #{
 					 env => #{dispatch => Dispatch}

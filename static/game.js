@@ -3,194 +3,11 @@
 var player_name = findGetParameter("name") || "player"
 var cursor_color = findGetParameter("color") || "white"
 
-// ### logic setup 
-class Size { 
-
-  constructor (x, y, w, h){
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-  }
-}
-
-class Card {
-
-  constructor (id, cat, frontimg, backimg, Size, side) {
-    this.id = id;
-    this.cat = cat;
-    this.Size = Size;
-
-    this.state = 0;
-    // 0 == laying down
-    // 1 == picked up
-
-    this.side = side;
-    this.scale = 0.4;
-
-    let front = new THREE.TextureLoader().load( frontimg );
-    let back = new THREE.TextureLoader().load( backimg );
-    let frontgeometry = new THREE.PlaneGeometry( 1, 1 );
-    let backgeometry = new THREE.PlaneGeometry( 1, 1 );
-    backgeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI ) );
-
-    let frontmat = new THREE.MeshBasicMaterial( { map: front, transparent: true } );
-    let backmat = new THREE.MeshBasicMaterial( { map: back, transparent: true } );
-
-    let mesh = new THREE.Mesh( frontgeometry, frontmat );
-    let bmesh = new THREE.Mesh( backgeometry, backmat );
-    mesh.card = this;
-    bmesh.card = this;
-
-    this.group = new THREE.Group();
-    this.group.add(mesh);
-    this.group.add(bmesh);
-
-    this.group.scale.set(this.Size.w * this.scale, this.Size.h * this.scale, 1);
-    if( side == 1 )
-      this.group.rotation.y = Math.PI;
-  }
-
-  click(state){
-    if(state == 1){
-      // this.state = 1;
-      this.group.scale.set(1.2 * this.Size.w * this.scale, 1.2 * this.Size.h * this.scale, 1);
-    } else {
-      // this.state = 0;
-      this.group.scale.set(this.Size.w * this.scale, this.Size.h * this.scale, 1);
-    }
-  }
-
-  setPos(pos){
-    this.group.position.set(pos.x, pos.y, parseInt(this.id));
-  }
-
-  canFlip(){
-    return !this.flipping;
-  }
-
-  startFlip(){
-
-    this.flipping = true;
-    let final = (this.side == 1) ? 0 : Math.PI;
-    this.side = (this.side + 1) % 2;
-
-    const frames_total = 20;
-    const frames_time = 16;
-    const rot_val = Math.PI / frames_total;
-    let m = this.group;
-    let t = this;
-
-    let interval = setInterval(function(){ 
-      m.rotation.y += rot_val;
-    }, 16);
-
-    setTimeout(function(){
-      t.flipping = false;
-      clearInterval(interval);
-      m.rotation.y = final;
-    }, frames_total * frames_time);
-  }
-
-  remove(){
-    scene[this.group].remove();
-  }
-
-}
-
-class Blocker { 
-
-  constructor(Size, owner){
-    this.size = Size;
-    this.owner = owner;
-    let color = cursors[owner].color;
-
-    this.opacity = (owner == player_name ? 0.2 : 1.0);
-
-    var geometry = new THREE.PlaneGeometry( Size.w, Size.h, 1 );
-    var material = new THREE.MeshBasicMaterial( {color: color, opacity: this.opacity, transparent: true, side: THREE.DoubleSide} );
-    this.plane = new THREE.Mesh( geometry, material );
-    this.plane.position.set(Size.x,Size.y,600);
-    this.plane.owner_player = owner;
-    scene.add( this.plane );
-  }
-
-  remove(){
-    scene.remove(this.plane);
-  }
-}
-
-class Text{
-  constructor( text ){
-    var fontface = "Arial";
-    var fontsize = 40;
-
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    context.font = "Bold " + fontsize + "px " + fontface;
-
-    var metrics = context.measureText( text );
-
-    context.fillStyle = "white";
-    context.strokeStyle = "black";
-    context.lineWidth = 10;
-    context.strokeText( text, 0, fontsize );
-    context.fillText( text, 0, fontsize );
-
-    var texture = new THREE.Texture(canvas) 
-    texture.needsUpdate = true;
-
-    var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
-    this.sprite = new THREE.Sprite( spriteMaterial );
-
-    this.sprite.scale.set(128,72,1.0);
-  }
-}
-
-class Cursor {
-
-  constructor(name, x, y, color){
-    this.name = name;
-    this.color = color;
-
-    this.blockers = [];
-
-    var map = new THREE.TextureLoader().load( "static/cursor.png" );
-    var material = new THREE.SpriteMaterial( { map: map, color: color } );
-    this.sprite = new THREE.Sprite( material );
-    this.sprite.position.set(-40, 0, 800);
-    this.sprite.scale.set(40, 40, 1);
-
-    this.sprite.thisis = "cursor";
-
-    this.text = new Text(name);
-    this.text.sprite.position.set(0,0, 800);
-  }
-
-  setPos(mouse){
-    this.pos = {x: mouse.x, y: mouse.y };
-    this.sprite.position.set(mouse.x, mouse.y, 800);
-    this.text.sprite.position.set(mouse.x+80,mouse.y-40, 800);
-  }
-}
-
-function findGetParameter(parameterName) {
-  var result = null,
-    tmp = [];
-  location.search
-    .substr(1)
-    .split("&")
-    .forEach(function (item) {
-      tmp = item.split("=");
-      if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-    });
-  return result;
-}
 
 var my_cursor_pos = {};
 var cursors = [];
 var cards = [];
-var holds = []; // name : card id
+var holds = []; // name -> card id
 
 
 // ### scene setup
@@ -202,13 +19,13 @@ var scene = new THREE.Scene();
 var extra_scene = new THREE.Scene();
 extra_scene.add(scene);
 var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 0.1, 1000 );
-var total_offset = {x: 0, y:0};
+camera.total_offset = {x: 0, y:0};
 
-function offset_camera(x, y){
-  total_offset.x += x;
-  total_offset.y += y;
-  camera.position.x = total_offset.x;
-  camera.position.y = total_offset.y;
+camera.move = (x, y) => {
+  camera.total_offset.x += x;
+  camera.total_offset.y += y;
+  camera.position.x = camera.total_offset.x;
+  camera.position.y = camera.total_offset.y;
 }
 
 var renderer = new THREE.WebGLRenderer();
@@ -241,12 +58,6 @@ function loadCards(received){
   }
 }
 
-function movePlayer(who, where){
-  if (who in cursors)
-    cursors[who].setPos(where);
-}
-
-
 function loadNewCursor(newPlayer){
   var new_cursor = new Cursor(newPlayer.name, 0, 0, newPlayer.color);
   cursors[newPlayer.name] = new_cursor;
@@ -272,8 +83,8 @@ canvas.addEventListener('mousemove', function(event){
   var x = event.clientX - rect.left;
   var y = event.clientY - rect.top;
 
-  rel_mouse.x = x - width / 2 + 20 + total_offset.x;
-  rel_mouse.y = - y + height / 2 - 20 + total_offset.y;
+  rel_mouse.x = x - width / 2 + 20 + camera.total_offset.x;
+  rel_mouse.y = - y + height / 2 - 20 + camera.total_offset.y;
 
   mouse.x = ( x / width ) * 2 - 1;
   mouse.y = - ( y / height ) * 2 + 1;
@@ -350,16 +161,16 @@ document.addEventListener('keydown', function(event) {
 
       break;
     case 'ArrowDown':
-      offset_camera(0, -50);
+      camera.move(0, -50);
       break;
     case 'ArrowUp':
-      offset_camera(0, 50);
+      camera.move(0, 50);
       break;
     case 'ArrowLeft':
-      offset_camera(-50,0);
+      camera.move(-50,0);
       break;
     case 'ArrowRight':
-      offset_camera(50,0);
+      camera.move(50,0);
       break;
   }
 
@@ -392,112 +203,113 @@ function chatlog(txt){
 var onJoin = {};
 var eyes_mode = false;
 
+var actions = [];
+actions["carddown"] = (params) => {
+  var player = params.name;
+  var clicked = cards[params.id];
+  clicked.click(0);
+  delete holds[player];
+}
+
+actions["cardup"] = (params) => {
+  var player = params.name;
+  var clicked = cards[params.id];
+  if(eyes_mode){
+    chatlog(player + " podnosi karte. kategoria " + clicked.cat);
+  }
+  clicked.click(1);
+  holds[player] = clicked;
+}
+
+actions["rotate"] = (params) => {
+  cards[params.id].startFlip();
+}
+
+actions["newcard"] = (params) => {
+  cards.push( loadCard(params.id, params) )
+}
+
+actions["delcard"] = (params) => {
+  cards[params.id].remove();
+  delete cards[params.id];
+}
+
+actions["blockernew"] = (params) => {
+  let owner = params.owner;
+  let size = params.size;
+  if ( owner in cursors ){
+    cursors[owner].blockers.push( new Blocker(size, owner) );
+  } else {
+    if(onJoin[owner] == undefined){
+      onJoin[owner] = [];
+    }
+    onJoin[owner].push(function() {
+      cursors[owner].blockers.push( new Blocker(size, owner) );
+    });
+  }
+
+}
+
+actions["cardmove"] = (params) => {
+  // todo
+}
+
+actions["new_player"] = (params) => {
+  loadNewCursor(params);
+  chatlog(params.name + " dołączył" );
+  if( params.name in onJoin ){
+    onJoin[params.name].forEach( (f) => f() );
+    delete onJoin[params.name];
+  }
+}
+
+actions["playerleft"] = (params) => {
+  let c = cursors[params.name];
+  chatlog(params.name + " zwiał" );
+  extra_scene.remove(c.sprite);
+  extra_scene.remove(c.text.sprite);
+  // c.blockers.forEach( (b) => b.remove() );
+  delete cursors[params.name];
+}
+
+actions["playermoved"] = (params) => {
+  cursors[params.name].setPos(params.newpos);
+  if( params.name in holds ){
+    var card = holds[params.name];
+    card.setPos(params.newpos);
+  }
+}
+
+actions["clear_chatlog"] = (params) => {
+  document.getElementById("chatlog").style.display = "none";
+  document.getElementById("chatlog").innerHTML = "witaj w ulica karasiowa the gaem";
+}
+
+actions["random_choice"] = (params) => {
+  chatlog(params.name + " losuje! kategoria " + params.cat);
+}
+
+actions["eyes_closed"] = (params) => {
+  eyes_mode = true;
+  canvas.style.display = "none";
+}
+
+actions["eyes_open"] = (params) => {
+  eyes_mode = false;
+  canvas.style.display = "block";
+}
+
+actions["chat"] = (params) => {
+  chatlog(params.name + "> " + params.text);
+}
+
 ws.addEventListener('message', function (event) {
   var obj = JSON.parse(event.data)
   var action = obj.action;
-
-  switch(action){
-    case "carddown":
-      var player = obj.params.name;
-      var clicked = cards[obj.params.id];
-      clicked.click(0);
-      delete holds[player];
-      break;
-
-    case "cardup":
-      var player = obj.params.name;
-      var clicked = cards[obj.params.id];
-      if(eyes_mode){
-	chatlog(player + " podnosi karte. kategoria " + clicked.cat);
-      }
-      clicked.click(1);
-      holds[player] = clicked;
-      break;
-
-    case "rotate":
-      cards[obj.params.id].startFlip();
-      break;
-
-    case "newcard":
-      cards.push( loadCard(obj.params.id, obj.params) )
-      break;
-
-    case "delcard":
-      cards[obj.params.id].remove();
-      delete cards[obj.params.id];
-      break;
-
-    case "blockernew":
-      let owner = obj.params.owner;
-      let size = obj.params.size;
-      if ( owner in cursors ){
-	cursors[owner].blockers.push( new Blocker(size, owner) );
-      } else {
-	if(onJoin[owner] == undefined){
-	  onJoin[owner] = [];
-	}
-	onJoin[owner].push(function() {
-	  cursors[owner].blockers.push( new Blocker(size, owner) );
-	});
-      }
-      
-      break;
-
-    case "cardmove":
-      // todo
-      break;
-
-    case "playerjoined":
-      loadNewCursor(obj.params);
-      chatlog(obj.params.name + " dołączył" );
-      if( obj.params.name in onJoin ){
-	onJoin[obj.params.name].forEach( (f) => f() );
-	delete onJoin[obj.params.name];
-      }
-      break;
-
-    case "playerleft":
-      let c = cursors[obj.params.name];
-      chatlog(obj.params.name + " zwiał" );
-      extra_scene.remove(c.sprite);
-      extra_scene.remove(c.text.sprite);
-      // c.blockers.forEach( (b) => b.remove() );
-      delete cursors[obj.params.name];
-      break;
-
-    case "playermoved":
-      movePlayer(obj.params.name, obj.params.newpos);
-      if( obj.params.name in holds ){
-        var card = holds[obj.params.name];
-        card.setPos(obj.params.newpos);
-      }
-      break;
-
-    case "clear_chatlog":
-      document.getElementById("chatlog").style.display = "none";
-      document.getElementById("chatlog").innerHTML = "witaj w ulica karasiowa the gaem";
-      break;
-
-    case "random_choice":
-      chatlog(obj.params.name + " losuje! kategoria " + obj.params.cat);
-      break;
-
-    case "eyes_closed":
-      eyes_mode = true;
-      canvas.style.display = "none";
-      break;
-
-    case "eyes_open":
-      eyes_mode = false;
-      canvas.style.display = "block";
-      break;
-
-    case "chat":
-      chatlog(obj.params.name + "> " + obj.params.text);
-      break;
-
-    default:
-      console.log('weird msg from server ', obj);
+  if( action in actions ){
+    actions[action](obj.params);
+  } else {
+    console.log('weird msg from server ', obj);
   }
 });
 

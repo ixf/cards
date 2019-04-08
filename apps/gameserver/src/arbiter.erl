@@ -33,7 +33,7 @@ init_cards(M) ->
   init_cards2(maps:next(I)).
 
 init_cards2(none) -> ok;
-init_cards2({Id,Value,Iter}) -> 
+init_cards2({Id,Value,Iter}) ->
   CardPid = card:new(Id, Value),
   ets:insert(cards, {Id,CardPid}),
   init_cards2(maps:next(Iter)).
@@ -48,10 +48,10 @@ bye(Name) ->
 
 
 broadcast(What) ->
-  ets:foldl(fun({_Name, Ws, _Player}, _Acc) -> 
-    Ws ! What,
-    acc
-  end, acc, players),
+  ets:foldl(fun({_Name, Ws, _Player}, _Acc) ->
+                Ws ! What,
+                acc
+            end, acc, players),
   ok.
 
 
@@ -59,7 +59,7 @@ handle_call({hello, Name, Color}, {Pid, _Tag}, State) ->
 
   case ets:lookup(players, Name) of
     [] ->
-      ThisPlayer = setup_player(Name, Color, Pid), 
+      ThisPlayer = setup_player(Name, Color, Pid),
       {reply, {ok,ThisPlayer}, State};
     _ ->
       {reply, {error,<<"taken">>}, State}
@@ -70,9 +70,9 @@ handle_call({bye, Name}, _From, State) ->
   io:format("player left: ~s~n", [Name]),
 
   Update = jiffy:encode(#{ <<"action">> => <<"playerleft">>,
-			   <<"params">> => #{ <<"name">> => Name } }),
+                           <<"params">> => #{ <<"name">> => Name } }),
   broadcast({update, Update}),
-  
+
   case ets:lookup(players, Name) of
     [] -> {noreply, State};
     [{Name, Ws, Player}] ->
@@ -87,47 +87,47 @@ setup_player(Name, Color, Pid) ->
 
   io:format("player joins: ~s~n", [Name]),
 
-  % inform about cards
+                                                % inform about cards
   ets:foldl(fun({_Id, CardPid}, _Acc) ->
-		card:getjson(CardPid, Pid), % Pid to pid gracza
-		acc
-	    end, acc, cards),
+                card:getjson(CardPid, Pid), % Pid to pid gracza
+                acc
+            end, acc, cards),
 
-  % inform other players about new guy
+                                                % inform other players about new guy
   ets:foldl(fun({_Name, WsPid, _PlayerPid}, _Acc) ->
-		player:getjson(ThisPlayer, WsPid),
-		acc
-	    end, acc, players),
+                player:getjson(ThisPlayer, WsPid),
+                acc
+            end, acc, players),
 
-  % add the player to table
-  % {Name, WsPid, PlayerPid}
+                                                % add the player to table
+                                                % {Name, WsPid, PlayerPid}
   ets:insert(players, {Name, Pid, ThisPlayer}),
 
-  % inform about all players ( including themselves )
+                                                % inform about all players ( including themselves )
   ets:foldl(fun({_Name, WsPid, PlayerPid}, _Acc) ->
-		player:getjson(PlayerPid, Pid),
-		acc
-	    end, acc, players),
+                player:getjson(PlayerPid, Pid),
+                acc
+            end, acc, players),
 
-  % inform the player about existing blockers
+                                                % inform the player about existing blockers
   ets:foldl(fun({_,Blocker}, Acc) ->
-		Pid ! {update, Blocker},
-		acc
-	    end, acc, blockers),
+                Pid ! {update, Blocker},
+                acc
+            end, acc, blockers),
   ThisPlayer.
 
 
 
 handle_info({blocker, X, Y, W, H, Owner}, State) ->
   Update = jiffy:encode(#{ <<"action">> => <<"blockernew">>,
-			  <<"params">> => #{
-			      <<"owner">> => Owner,
-			      <<"size">> => #{
-				  <<"x">> => X,
-				  <<"y">> => Y,
-				  <<"w">> => W,
-				  <<"h">> => H
-				 } } }),
+                           <<"params">> => #{
+                                             <<"owner">> => Owner,
+                                             <<"size">> => #{
+                                                             <<"x">> => X,
+                                                             <<"y">> => Y,
+                                                             <<"w">> => W,
+                                                             <<"h">> => H
+                                                            } } }),
   ets:insert(blockers, {1, Update}),
   broadcast({update,Update}),
   {noreply, State};
@@ -143,19 +143,19 @@ handle_info(eyes_open, State) ->
 handle_info({eyes, Name}, State) ->
   Open = {update, jiffy:encode( #{ <<"action">> => <<"eyes_open">> } ) },
   Close = {update, jiffy:encode( #{ <<"action">> => <<"eyes_closed">> } ) },
-  ets:foldl(fun({Found, Ws, _Player}, _Acc) when Found == Name -> 
-		   Ws ! Open;
-	       ({Other, Ws, _Player}, _Acc) ->
-		  Ws ! Close
-	    end, acc, players),
+  ets:foldl(fun({Found, Ws, _Player}, _Acc) when Found == Name ->
+                Ws ! Open;
+               ({Other, Ws, _Player}, _Acc) ->
+                Ws ! Close
+            end, acc, players),
   {noreply, State};
 
 handle_info(restate, State) ->
   ets:delete(blockers),
   ets:new(blockers, [bag, named_table]),
-  ets:foldl(fun({Id, Pid}, Acc) -> 
-		Pid ! leave
-	    end, acc, cards),
+  ets:foldl(fun({Id, Pid}, Acc) ->
+                Pid ! leave
+            end, acc, cards),
   setup_state(),
   {noreply, State};
 
