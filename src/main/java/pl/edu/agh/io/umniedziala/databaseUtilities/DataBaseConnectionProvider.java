@@ -30,6 +30,7 @@ public class DataBaseConnectionProvider {
             QuerryExecutor.create("create table if not exists application (" +
                     "  id integer not null primary key autoincrement," +
                     "  name  varchar(100) not null," +
+                    "  application_path text not null, " +
                     "  color integer" +
                     ");");
         } catch (SQLException e) {
