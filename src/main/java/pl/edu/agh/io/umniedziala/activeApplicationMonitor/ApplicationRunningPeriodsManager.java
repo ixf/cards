@@ -48,7 +48,7 @@ public class ApplicationRunningPeriodsManager {
     private void updateCurrentRunningPeriod() {
         try {
             QuerryExecutor
-                    .update(String.format("UPDATE running_periods "
+                    .update(String.format("UPDATE running_period "
                         + "SET end_time = '%s' "
                         + "WHERE id = %d"
                             , getCurrentDateTime(), lastRunningPeriodId)
@@ -67,7 +67,7 @@ public class ApplicationRunningPeriodsManager {
 
             lastRunningPeriodId = QuerryExecutor.createAndObtainId(
                     String.format(
-                            "INSERT INTO running_periods (start_time, end_time, application_id) " +
+                            "INSERT INTO running_period (start_time, end_time, application_id) " +
                             "VALUES('%s', '%s', %d)"
                             , getCurrentDateTime(), getCurrentDateTime(), lastApplicationCheckedId
                     )

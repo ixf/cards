@@ -41,7 +41,7 @@ public class DataBaseConnectionProvider {
             QuerryExecutor.create("create table if not exists running_period(" +
                     "  id integer not null primary key autoincrement," +
                     "  start_time datetime not null," +
-                    "  end_time datetime," +
+                    "  end_time datetime not null," +
                     "  application_id int not null" +
                     "    constraint application_id___fk" +
                     "    references application" +
