@@ -1,9 +1,11 @@
-package pl.agh.edu.io.umniedziala;
+package pl.edu.agh.io.umniedziala;
+
+import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
 
 public class Main {
     public static void main(String[] args) {
 
-        System.out.printf("Hello world");
+        new ActiveApplicationListener().start();
 
     }
 }
