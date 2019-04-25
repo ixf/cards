@@ -94,9 +94,9 @@ public class MainViewController {
     @FXML
     public void handle_app_add(ActionEvent event) throws IOException {
         List<File> list =
-                fileChooser.showOpenMultipleDialog(new Stage());
+                fileChooser.showOpenMultipleDialog(new Stage()); //TODO: add file to DB
         for (File file : list) {
-            System.out.println(file.getName());
+            System.out.println(file.getAbsolutePath());
         }
     }
 
