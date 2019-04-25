@@ -1,4 +1,5 @@
 package pl.edu.agh.io.umniedziala;
+import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -19,12 +20,10 @@ public class Main extends Application {
 
         this.appController = new AppController(primaryStage);
         this.appController.initRootLayout();
-
     }
 
     public static void main(String[] args) {
+        new ActiveApplicationListener().start();
         launch(args);
     }
-
-
 }
