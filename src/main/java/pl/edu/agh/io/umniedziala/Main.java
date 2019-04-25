@@ -4,8 +4,6 @@ import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListe
 
 public class Main {
     public static void main(String[] args) {
-
-        new ActiveApplicationListener().start();
-
+        new ActiveApplicationListener(5000).start();
     }
 }

@@ -11,17 +11,28 @@ public class ActiveApplicationListener extends Thread {
 
     private final ApplicationRunningPeriodsManager programRunningPeriodsManager;
 
+    private int checkingIntervalInMs;
 
-    public ActiveApplicationListener() {
+
+    public ActiveApplicationListener(int checkingIntervalInMs) {
 
         this.programRunningPeriodsManager = new ApplicationRunningPeriodsManager();
+
+        this.checkingIntervalInMs = checkingIntervalInMs;
     }
 
     public void run() {
         while (true) {
-            String windowName = getCurrentActiveWindowName();
+            String windowName = null;
+            try {
+                windowName = getCurrentActiveWindowName();
+            } catch (ActiveWindowNotFound activeWindowNotFound) {
+                System.err.println("Active window not found");
+                activeWindowNotFound.printStackTrace();
+            }
             String appName = windowName.split("\\\\")[windowName.split("\\\\").length - 1];
 
+            // todo logging
             // debuging ======
             System.out.println("Active window title: " + windowName);
             System.out.println("App name: " + appName);
@@ -31,8 +42,7 @@ public class ActiveApplicationListener extends Thread {
             this.programRunningPeriodsManager.handleApplicationRunningPeriod(appName);
 
             try {
-                // change interval in which periods want to be updated
-                Thread.sleep(5000);
+                Thread.sleep(checkingIntervalInMs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -40,14 +50,12 @@ public class ActiveApplicationListener extends Thread {
     }
 
 
-    private String getCurrentActiveWindowName() {
-        char[] buffer = new char[MAX_TITLE_LENGTH * 2];
+    private String getCurrentActiveWindowName() throws ActiveWindowNotFound {
         WinDef.HWND hwnd = User32.INSTANCE.GetForegroundWindow();
-        User32.INSTANCE.GetWindowText(hwnd, buffer, MAX_TITLE_LENGTH);
 
         String fgImageName = getImageName(hwnd);
         if (fgImageName == null) {
-            return "Application not found";
+            throw new ActiveWindowNotFound();
         } else {
             return fgImageName;
         }
