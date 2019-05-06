@@ -6,7 +6,13 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ActiveApplicationListener extends Thread {
+
+    private static final Logger logger = Logger.getLogger(ActiveApplicationListener.class.getName());
+
     private final int MAX_TITLE_LENGTH = 1024;
 
     private final ApplicationRunningPeriodsManager programRunningPeriodsManager;
@@ -27,17 +33,13 @@ public class ActiveApplicationListener extends Thread {
             try {
                 windowName = getCurrentActiveWindowName();
             } catch (ActiveWindowNotFound activeWindowNotFound) {
+                logger.log(Level.WARNING, "Active window not found");
                 System.err.println("Active window not found");
                 activeWindowNotFound.printStackTrace();
             }
             String appName = windowName.split("\\\\")[windowName.split("\\\\").length - 1];
 
-            // todo logging
-            // debuging ======
-            System.out.println("Active window title: " + windowName);
-            System.out.println("App name: " + appName);
-            System.out.println("==================");
-            // ===============
+            logger.info("Active window title: " + windowName);
 
             this.programRunningPeriodsManager.handleApplicationRunningPeriod(appName);
 
