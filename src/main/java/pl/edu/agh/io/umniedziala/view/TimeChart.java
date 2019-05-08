@@ -61,6 +61,7 @@ public class TimeChart extends XYChart<Number, String> {
         super(timeAxis, appAxis);
         setData(FXCollections.observableArrayList());
         timeAxis.setLowerBound(minHour * 60 * 60);
+        setLegendVisible(false);
 
         // oś czasu przechowuje sekundy dnia i wyświetla je po formatowaniu do stringa
         timeAxis.setUpperBound(maxHour * 60 * 60);
