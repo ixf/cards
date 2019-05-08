@@ -59,7 +59,7 @@ public class ApplicationEntity {
     }
 
     public static Optional<ApplicationEntity> findByName(final String name) {
-        String findByNameSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.NAME, name);
+        String findByNameSql = String.format("SELECT * FROM %s WHERE %s = '%s'", TABLE_NAME, Columns.NAME, name);
 
         ResultSet rs;
         try {
@@ -73,7 +73,7 @@ public class ApplicationEntity {
     }
 
     public static Optional<ApplicationEntity> findByApplicationPath(final String applicationPath) {
-        String findByNameSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.APPLICATION_PATH, applicationPath);
+        String findByNameSql = String.format("SELECT * FROM %s WHERE %s = '%s'", TABLE_NAME, Columns.APPLICATION_PATH, applicationPath);
 
         ResultSet rs;
         try {
