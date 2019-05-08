@@ -18,8 +18,8 @@ public class TimeChart extends XYChart<Number, String> {
 
     // granice w których wyświetlamy wyrkes
     // może to się będzie jakoś ustawiać a może zoomować/przesuwać wykres i będzie zbędne
-    private static final int minHour = 19;
-    private static final int maxHour = 20;
+    private static final int minHour = 23;
+    private static final int maxHour = 24;
 
     // powinno się dynamicznie zmieniać może? TODO
     private static final double lineHeight = 80.0;

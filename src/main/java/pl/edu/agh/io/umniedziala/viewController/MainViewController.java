@@ -4,6 +4,7 @@
 
 package pl.edu.agh.io.umniedziala.viewController;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -91,13 +92,30 @@ public class MainViewController {
         Date current_date = new Date();
         date.setText(dateFormat.format(current_date));
         managingApplicationsController = new ManagingApplicationsController();
-        try {
-            addTrackedAppsToTimechart();
-            loadExistingDataToTimechart(current_date);
-        } catch (SQLException e) {
-            // TODO jakiś ładny alert
-            e.printStackTrace();
-        }
+
+        startTimechartUpdates(current_date);
+    }
+
+    private void startTimechartUpdates(Date current_date) {
+        // Nasz timechart jest szeroki a bazę aktualizujemy często. Nie ma chyba potrzeby, żeby aktualizować
+        // wykresy przy każdej zmianie w bazie. Uruchamiam tutaj timer, który co kilka minut aktualizuje wykres.
+
+        long repeatTime = 1 * 15 * 1000; // w milisekundach
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() ->{
+                    try {
+                        addTrackedAppsToTimechart();
+                        loadExistingDataToTimechart(current_date);
+                    } catch (SQLException e) {
+                        // TODO jakiś ładny alert
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }, 0, repeatTime);
     }
 
     public void setAppController(AppController appController) {
