@@ -14,13 +14,18 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="459.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.MainViewController">
+<AnchorPane prefHeight="459.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.192" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.MainViewController">
    <children>
       <BorderPane prefHeight="459.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
             <Pane fx:id="border" prefHeight="88.0" prefWidth="600.0" style="-fx-background-color: #4c9bcc;" BorderPane.alignment="CENTER">
                <children>
                   <Button fx:id="app_add" alignment="CENTER" contentDisplay="CENTER" layoutX="26.0" layoutY="26.0" mnemonicParsing="false" onAction="#handle_app_add" style="-fx-background-color: #436791; -fx-text-fill: white;" text="Choose application to track">
+                     <font>
+                        <Font name="Comic Sans MS" size="16.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="generate_report" alignment="CENTER" contentDisplay="CENTER" layoutX="275.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleReportGeneration" style="-fx-background-color: #436791; -fx-text-fill: white;" text="Generate report">
                      <font>
                         <Font name="Comic Sans MS" size="16.0" />
                      </font>
