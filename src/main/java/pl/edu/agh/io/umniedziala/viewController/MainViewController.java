@@ -4,9 +4,12 @@
 
 package pl.edu.agh.io.umniedziala.viewController;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -18,6 +21,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pl.edu.agh.io.umniedziala.ManagingApplicationsController;
 import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
+import pl.edu.agh.io.umniedziala.model.ComputerRunningPeriodEntity;
+import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
+import pl.edu.agh.io.umniedziala.view.TimeChart;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +32,11 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.*;
 
 import static pl.edu.agh.io.umniedziala.databaseUtilities.DataBaseConnectionProvider.getConnection;
 
@@ -64,13 +72,16 @@ public class MainViewController {
     private ImageView right_date;
 
     @FXML
-    private BarChart activity_chart;
+    private TimeChart activity_chart;
+
+    @FXML
+    private CategoryAxis app_axis;
+
+    @FXML
+    private NumberAxis time_axis;
 
     @FXML
     private Button app_add;
-
-    @FXML
-    private TableView table;
 
     @FXML
     private Button generate_report;
@@ -80,22 +91,28 @@ public class MainViewController {
         Date current_date = new Date();
         date.setText(dateFormat.format(current_date));
         managingApplicationsController = new ManagingApplicationsController();
-        getTrackedApps();
+        try {
+            addTrackedAppsToTimechart();
+            loadExistingDataToTimechart(current_date);
+        } catch (SQLException e) {
+            // TODO jakiś ładny alert
+            e.printStackTrace();
+        }
     }
 
     public void setAppController(AppController appController) {
         this.appController = appController;
     }
 
-    private void getTrackedApps(){
-        try {
-            ResultSet result = QuerryExecutor.read("SELECT * FROM application");
-            while (result.next()){
-                //TODO: dodać aplikacje do TableView table
-            }
-        } catch (SQLException e){
-            System.out.println("Application not loaded from db");
-        }
+    private void loadExistingDataToTimechart(Date date) throws SQLException {
+        List<RunningPeriodEntity> results = QuerryExecutor.getPeriodsForDay(date);
+        activity_chart.setDataByResults(results);
+    }
+
+    public void addTrackedAppsToTimechart() throws SQLException {
+        Map<Integer, String> appNames = QuerryExecutor.getAppNames();
+        app_axis.setCategories(FXCollections.observableArrayList(appNames.values()));
+        activity_chart.setAppNames(appNames);
     }
 
     @FXML

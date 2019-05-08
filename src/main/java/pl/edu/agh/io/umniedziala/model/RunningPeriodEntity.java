@@ -56,7 +56,7 @@ public class RunningPeriodEntity {
 
 
 
-    private static Optional<RunningPeriodEntity> returnRunningPeriod(ResultSet rs) {
+    public static Optional<RunningPeriodEntity> returnRunningPeriod(ResultSet rs) {
         try {
             return Optional.of(new RunningPeriodEntity(
                     rs.getInt(Columns.ID),

@@ -1,9 +1,17 @@
 package pl.edu.agh.io.umniedziala.databaseUtilities;
 
+import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class QuerryExecutor {
 
@@ -29,6 +37,41 @@ public class QuerryExecutor {
     public static ResultSet read(final String sql) throws SQLException {
         final Statement statement = DataBaseConnectionProvider.getConnection().createStatement();
         return statement.executeQuery(sql);
+    }
+
+    public static Map<Integer, String> getAppNames() throws SQLException {
+        ResultSet resultSet = QuerryExecutor.read("SELECT * FROM application");
+        Map<Integer, String> names = new HashMap<>();
+        while (resultSet.next()) {
+            names.put(resultSet.getInt("id"), resultSet.getString("name"));
+        }
+        resultSet.close();
+        return names;
+    }
+
+    public static List<RunningPeriodEntity> getPeriodsForDay(java.util.Date date) throws SQLException {
+        LocalDate today = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        java.sql.Date dateAtStart = java.sql.Date.valueOf(today);
+        java.sql.Date dateAtEnd = java.sql.Date.valueOf(today.plusDays(1));
+
+        String sql = "SELECT * FROM running_period"; // WHERE start_time > ?"; // AND end_time < ?";
+
+        ResultSet resultSet;
+        try (final PreparedStatement statement = DataBaseConnectionProvider.getConnection().prepareStatement(sql)) {
+            //statement.setDate(1, dateAtStart);
+            //statement.setDate(2, dateAtEnd);
+
+            resultSet = statement.executeQuery();
+
+            List<RunningPeriodEntity> periods = new ArrayList<>();
+            while (resultSet.next()) {
+                RunningPeriodEntity period = RunningPeriodEntity.returnRunningPeriod(resultSet).orElseThrow(() -> new RuntimeException("Couldn't read RunningPeriodEntity from resultSet"));
+                periods.add( period );
+            }
+            resultSet.close();
+
+            return periods;
+        }
     }
 
     public static void create(final String insertSql) throws SQLException {
