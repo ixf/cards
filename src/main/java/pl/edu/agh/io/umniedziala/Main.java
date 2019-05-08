@@ -1,4 +1,5 @@
 package pl.edu.agh.io.umniedziala;
+
 import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
 
 import javafx.application.Application;
@@ -23,7 +24,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        new ActiveApplicationListener().start();
+        new ActiveApplicationListener(5000).start();
         launch(args);
     }
 }
