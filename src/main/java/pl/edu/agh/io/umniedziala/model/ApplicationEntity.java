@@ -42,22 +42,6 @@ public class ApplicationEntity {
         return ApplicationEntity.findById(id);
     }
 
-    public static boolean delete(final int id) {
-        String deleteSql = String.format(
-                "DELETE FROM %s WHERE %s = %d"
-                , TABLE_NAME, Columns.ID, id
-        );
-
-        try {
-            QuerryExecutor.delete(deleteSql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
     public static Optional<ApplicationEntity> findByName(final String name) {
         String findByNameSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.NAME, name);
 

@@ -6,45 +6,33 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class ActiveApplicationListener extends Thread {
-
-    private static final Logger logger = Logger.getLogger(ActiveApplicationListener.class.getName());
-
     private final int MAX_TITLE_LENGTH = 1024;
 
     private final ApplicationRunningPeriodsManager programRunningPeriodsManager;
 
-    private int checkingIntervalInMs;
 
-
-    public ActiveApplicationListener(int checkingIntervalInMs) {
+    public ActiveApplicationListener() {
 
         this.programRunningPeriodsManager = new ApplicationRunningPeriodsManager();
-
-        this.checkingIntervalInMs = checkingIntervalInMs;
     }
 
     public void run() {
         while (true) {
-            String windowName = null;
-            try {
-                windowName = getCurrentActiveWindowName();
-            } catch (ActiveWindowNotFound activeWindowNotFound) {
-                logger.log(Level.WARNING, "Active window not found");
-                System.err.println("Active window not found");
-                activeWindowNotFound.printStackTrace();
-            }
+            String windowName = getCurrentActiveWindowName();
             String appName = windowName.split("\\\\")[windowName.split("\\\\").length - 1];
 
-            logger.info("Active window title: " + windowName);
+            // debuging ======
+            System.out.println("Active window title: " + windowName);
+            System.out.println("App name: " + appName);
+            System.out.println("==================");
+            // ===============
 
             this.programRunningPeriodsManager.handleApplicationRunningPeriod(appName);
 
             try {
-                Thread.sleep(checkingIntervalInMs);
+                // change interval in which periods want to be updated
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -52,12 +40,14 @@ public class ActiveApplicationListener extends Thread {
     }
 
 
-    private String getCurrentActiveWindowName() throws ActiveWindowNotFound {
+    private String getCurrentActiveWindowName() {
+        char[] buffer = new char[MAX_TITLE_LENGTH * 2];
         WinDef.HWND hwnd = User32.INSTANCE.GetForegroundWindow();
+        User32.INSTANCE.GetWindowText(hwnd, buffer, MAX_TITLE_LENGTH);
 
         String fgImageName = getImageName(hwnd);
         if (fgImageName == null) {
-            throw new ActiveWindowNotFound();
+            return "Application not found";
         } else {
             return fgImageName;
         }
