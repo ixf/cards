@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
@@ -35,8 +36,14 @@ public class AppController {
         // add layout to a scene and show them all
         Scene scene = new Scene(rootLayout);
         primaryStage.setScene(scene);
+        primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
         primaryStage.show();
 
+    }
+
+    private void closeWindowEvent(WindowEvent event) {
+        System.out.println("Window close request ...");
+        //TODO: tu obsługa wydarzeń przed zamknięciem apki
     }
 
     public void showReportGenerationWindow(){

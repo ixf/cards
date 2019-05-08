@@ -93,7 +93,7 @@
             </BorderPane>
          </top>
          <center>
-            <TableView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <columns>
                 <TableColumn prefWidth="50.0" text="Name" />
                 <TableColumn prefWidth="75.0" text="Usage" />
