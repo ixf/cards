@@ -32,6 +32,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.27.2.1'
+    compile group: 'com.opencsv', name: 'opencsv', version: '4.1'
+
 
     // https://github.com/java-native-access/jna
     implementation 'net.java.dev.jna:jna:5.2.0'
