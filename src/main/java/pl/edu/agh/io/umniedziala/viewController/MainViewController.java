@@ -75,7 +75,7 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_left_date(MouseEvent event) throws IOException, ParseException {
+    public void handle_left_date(MouseEvent event) throws ParseException {
         String date_text = date.getText();
         Date curr_date = dateFormat.parse(date_text);
         Calendar cal = Calendar.getInstance();
@@ -85,7 +85,7 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_right_date(MouseEvent event) throws IOException, ParseException {
+    public void handle_right_date(MouseEvent event) throws ParseException {
         String date_text = date.getText();
         Date curr_date = dateFormat.parse(date_text);
         Calendar cal = Calendar.getInstance();
@@ -95,7 +95,7 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_app_add(ActionEvent event) throws IOException {
+    public void handle_app_add(ActionEvent event) {
         List<File> list =
                 fileChooser.showOpenMultipleDialog(new Stage()); //TODO: add file to DB
         for (File file : list) {
