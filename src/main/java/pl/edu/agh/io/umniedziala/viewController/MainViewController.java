@@ -62,6 +62,9 @@ public class MainViewController {
     private Button app_add;
 
     @FXML
+    private Button generate_report;
+
+    @FXML
     public void initialize(){
         Date current_date = new Date();
         date.setText(dateFormat.format(current_date));
@@ -72,7 +75,7 @@ public class MainViewController {
     }
 
     @FXML
-    private void handle_left_date(MouseEvent event) throws IOException, ParseException {
+    public void handle_left_date(MouseEvent event) throws IOException, ParseException {
         String date_text = date.getText();
         Date curr_date = dateFormat.parse(date_text);
         Calendar cal = Calendar.getInstance();
@@ -98,6 +101,12 @@ public class MainViewController {
         for (File file : list) {
             System.out.println(file.getAbsolutePath());
         }
+    }
+
+
+    @FXML
+    public void handleReportGeneration(ActionEvent event){
+        appController.showReportGenerationWindow();
     }
 
 }
