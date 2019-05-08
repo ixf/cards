@@ -4,6 +4,8 @@ import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RunningPeriodEntity {
@@ -52,6 +54,47 @@ public class RunningPeriodEntity {
         }
 
         return Optional.empty();
+    }
+
+    public static List<RunningPeriodEntity> findByStartDate(final String startDate, final String appName) {
+        String findByStartDateSql = String.format(
+                "SELECT * FROM %s " +
+                        "INNER JOIN %s ON %s.%s = %s.%s " +
+                        "WHERE %s >= Datetime('%s 00:00:00') and %s <= Datetime('%s 23:59:59') " +
+                        "and %s = '%s'"
+                , TABLE_NAME
+                , ApplicationEntity.TABLE_NAME, ApplicationEntity.TABLE_NAME, ApplicationEntity.Columns.ID
+                , TABLE_NAME, Columns.APPLICATION_ID
+                , Columns.START_TIME, startDate
+                , Columns.START_TIME, startDate
+                , ApplicationEntity.Columns.NAME, appName
+        );
+
+        Optional<ResultSet> rs = Optional.empty();
+        try {
+            rs = Optional.of(QuerryExecutor.read(findByStartDateSql));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        List<RunningPeriodEntity> resutList = new ArrayList<>();
+        if (rs.isPresent()) {
+            try {
+                while (rs.get().next()) {
+                    resutList.add(new RunningPeriodEntity(
+                            rs.get().getInt(Columns.ID),
+                            rs.get().getString(Columns.START_TIME),
+                            rs.get().getString(Columns.END_TIME),
+                            rs.get().getInt(Columns.APPLICATION_ID)
+                    ));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return resutList;
     }
 
 
