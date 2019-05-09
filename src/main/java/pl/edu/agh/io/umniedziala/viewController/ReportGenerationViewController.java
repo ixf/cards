@@ -11,7 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import pl.edu.agh.io.umniedziala.ReportsGenerator.BasicReport;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 
@@ -60,7 +62,12 @@ public class ReportGenerationViewController {
     @FXML
     public void generateHandler(ActionEvent event) {
         if( fromSet && toSet){
-            //TODO: generate report
+            try {
+                BasicReport basicReport = new BasicReport(from,to);
+                basicReport.run();
+            } catch (IOException e){
+                errorText.setText("Report not generated");
+            }
             System.out.println("report generated");
             stage.close();
         } else {
