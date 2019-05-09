@@ -38,7 +38,6 @@ public class ManagingApplicationsController {
                 return false;
             }
 
-            ApplicationEntity.delete(application.get().getId());
             return true;
         }
     }
