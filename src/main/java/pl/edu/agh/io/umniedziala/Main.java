@@ -4,7 +4,9 @@ import pl.edu.agh.io.umniedziala.ReportsGenerator.BasicReport;
 import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
 import pl.edu.agh.io.umniedziala.model.ApplicationEntity;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
-
+import javafx.application.Application;
+import javafx.stage.Stage;
+import pl.edu.agh.io.umniedziala.viewController.AppController;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,18 @@ public class Main {
         DateTimeFormatter germanFormatter = DateTimeFormatter.ofLocalizedDate(
                 FormatStyle.MEDIUM).withLocale(Locale.GERMAN);
 
+        private Stage primaryStage;
+
+        private AppController appController;
+
+        @Override
+        public void start(Stage primaryStage) throws IOException {
+          this.primaryStage = primaryStage;
+          this.primaryStage.setTitle("WorkMonitor");
+
+          this.appController = new AppController(primaryStage);
+          this.appController.initRootLayout();
+        }
 
         // testing purposes insertion into DB
         ApplicationEntity.create("idea64.exe","C:\\Program Files\\JetBrains\\IntelliJ ",4);
@@ -37,7 +51,7 @@ public class Main {
         }
 
         new ActiveApplicationListener().start();
-
+        launch(args);
 
     }
 }

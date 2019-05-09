@@ -29,13 +29,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-
-    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.27.2.1'
-    compile group: 'com.opencsv', name: 'opencsv', version: '4.1'
-
-
+    compile group:'org.xerial', name:'sqlite-jdbc', version:'3.8.11.2'
     // https://github.com/java-native-access/jna
-    implementation 'net.java.dev.jna:jna:5.2.0'
-    implementation 'net.java.dev.jna:jna-platform:5.2.0'
+
+    compile group: 'com.1stleg', name: 'jnativehook', version: '2.0.2'
+    compile 'com.opencsv:opencsv:4.6'
+    compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
+
 }
