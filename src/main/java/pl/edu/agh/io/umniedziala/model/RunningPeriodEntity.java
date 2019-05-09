@@ -44,7 +44,7 @@ public class RunningPeriodEntity {
 
 
     public static Optional<RunningPeriodEntity> findById(final int id) {
-        String findByIdSql = String.format("SELECT * FROM %s WHERE %s = %d", TABLE_NAME, Columns.ID, id);
+        String findByIdSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.ID, id);
 
         try {
             ResultSet rs = QuerryExecutor.read(findByIdSql);

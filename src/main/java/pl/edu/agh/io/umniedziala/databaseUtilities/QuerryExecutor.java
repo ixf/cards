@@ -37,10 +37,4 @@ public class QuerryExecutor {
         }
     }
 
-    public static void delete(final String deleteSql) throws SQLException {
-        try (final PreparedStatement statement = DataBaseConnectionProvider.getConnection().prepareStatement(deleteSql)) {
-            statement.execute();
-        }
-    }
-
 }
