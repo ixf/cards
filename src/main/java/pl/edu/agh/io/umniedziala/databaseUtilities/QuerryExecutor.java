@@ -54,12 +54,12 @@ public class QuerryExecutor {
         java.sql.Date dateAtStart = java.sql.Date.valueOf(today);
         java.sql.Date dateAtEnd = java.sql.Date.valueOf(today.plusDays(1));
 
-        String sql = "SELECT * FROM running_period"; // WHERE start_time > ?"; // AND end_time < ?";
+        String sql = "SELECT * FROM running_period WHERE start_time > ? AND end_time < ?";
 
         ResultSet resultSet;
         try (final PreparedStatement statement = DataBaseConnectionProvider.getConnection().prepareStatement(sql)) {
-            //statement.setDate(1, dateAtStart);
-            //statement.setDate(2, dateAtEnd);
+            statement.setString(1, dateAtStart.toString());
+            statement.setString(2, dateAtEnd.toString());
 
             resultSet = statement.executeQuery();
 
