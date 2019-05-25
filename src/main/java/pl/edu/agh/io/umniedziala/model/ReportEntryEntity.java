@@ -4,18 +4,15 @@ import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 
 public class ReportEntryEntity {
 
-    private final int NUMBER_OF_DATE_COLUMN = 2;
-
     private String applicationName;
-    private String date;
-    private String workingHours;
-    private String activeWorkingHours;
-    private String startTime;
-    private String endTime;
+    private Date date;
+    private Date startTime;
+    private Date endTime;
 
 
     public ReportEntryEntity() {}
@@ -24,7 +21,7 @@ public class ReportEntryEntity {
         ResultSet result = null;
         try {
              result = QuerryExecutor.read(String.format("SELECT name, end_time, start_time FROM application join running_period " +
-                    "on application.id = running_period.application_id " +
+                     "on application.id = running_period.application_id " +
                      "where DATE(start_time) >= '%s' and Date(end_time) <= '%s'",from,to));
              return result;
         } catch (SQLException e) {
@@ -33,40 +30,36 @@ public class ReportEntryEntity {
         return result;
     }
 
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
     }
 
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public void setWorkingHours(String workingHours) {
-        this.workingHours = workingHours;
-    }
-
-    public void setActiveWorkingHours(String activeWorkingHours) {
-        this.activeWorkingHours = activeWorkingHours;
-    }
-
-    public void setStartTime(String startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s %s %s %s %s %s",applicationName,date,workingHours,activeWorkingHours,startTime,endTime);
-    }
 }
