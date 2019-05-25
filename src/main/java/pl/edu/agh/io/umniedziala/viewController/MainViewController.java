@@ -8,12 +8,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -22,24 +20,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pl.edu.agh.io.umniedziala.ManagingApplicationsController;
 import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
-import pl.edu.agh.io.umniedziala.model.ComputerRunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.view.TimeChart;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
-
-import static pl.edu.agh.io.umniedziala.databaseUtilities.DataBaseConnectionProvider.getConnection;
 
 public class MainViewController {
     private AppController appController;
@@ -47,6 +36,8 @@ public class MainViewController {
     final FileChooser fileChooser = new FileChooser();
     ManagingApplicationsController managingApplicationsController;
     final static int DEFAULT_COLOR = 0;
+
+    private Date currentDate;
 
     @FXML
     private Label activity;
@@ -89,14 +80,14 @@ public class MainViewController {
 
     @FXML
     public void initialize(){
-        Date current_date = new Date();
-        date.setText(dateFormat.format(current_date));
+        currentDate = new Date();
+        date.setText(dateFormat.format(currentDate));
         managingApplicationsController = new ManagingApplicationsController();
 
-        startTimechartUpdates(current_date);
+        startTimechartUpdates();
     }
 
-    private void startTimechartUpdates(Date current_date) {
+    private void startTimechartUpdates() {
         // Nasz timechart jest szeroki a bazę aktualizujemy często. Nie ma chyba potrzeby, żeby aktualizować
         // wykresy przy każdej zmianie w bazie. Uruchamiam tutaj timer, który co kilka minut aktualizuje wykres.
 
@@ -108,7 +99,7 @@ public class MainViewController {
                 Platform.runLater(() ->{
                     try {
                         addTrackedAppsToTimechart();
-                        loadExistingDataToTimechart(current_date);
+                        loadExistingDataToTimechart(currentDate);
                     } catch (SQLException e) {
                         // TODO jakiś ładny alert
                         e.printStackTrace();
@@ -134,27 +125,29 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_left_date(MouseEvent event) throws ParseException {
-        String date_text = date.getText();
-        Date curr_date = dateFormat.parse(date_text);
+    public void handle_left_date(MouseEvent event) throws ParseException, SQLException {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(curr_date);
+        cal.setTime(currentDate);
         cal.add(Calendar.DATE,-1);
-        date.setText(dateFormat.format(cal.getTime()));
+        currentDate.setTime(cal.getTimeInMillis());
+
+        date.setText(dateFormat.format(currentDate.getTime()));
+        loadExistingDataToTimechart(new Date(cal.getTimeInMillis()));
     }
 
     @FXML
-    public void handle_right_date(MouseEvent event) throws ParseException {
-        String date_text = date.getText();
-        Date curr_date = dateFormat.parse(date_text);
+    public void handle_right_date(MouseEvent event) throws ParseException, SQLException {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(curr_date);
+        cal.setTime(currentDate);
         Date today = new Date();
         String today_text = dateFormat.format(today);
         today = dateFormat.parse(today_text);
-        if (curr_date.compareTo(today) < 0 ) {
+        if (currentDate.compareTo(today) < 0 ) {
             cal.add(Calendar.DATE, 1);
-            date.setText(dateFormat.format(cal.getTime()));
+            currentDate.setTime(cal.getTimeInMillis());
+            date.setText(dateFormat.format(currentDate.getTime()));
+
+            loadExistingDataToTimechart(new Date(cal.getTimeInMillis()));
         }
     }
 

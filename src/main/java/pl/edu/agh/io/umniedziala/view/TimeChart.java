@@ -2,8 +2,10 @@ package pl.edu.agh.io.umniedziala.view;
 
 import javafx.beans.NamedArg;
 import javafx.collections.FXCollections;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -18,7 +20,7 @@ public class TimeChart extends XYChart<Number, String> {
 
     // granice w których wyświetlamy wyrkes
     // może to się będzie jakoś ustawiać a może zoomować/przesuwać wykres i będzie zbędne
-    private static final int minHour = 23;
+    private static final int minHour = 8;
     private static final int maxHour = 24;
 
     // powinno się dynamicznie zmieniać może? TODO
@@ -30,10 +32,10 @@ public class TimeChart extends XYChart<Number, String> {
 
     public static class ExtraData {
 
-        private long length; // w sekundach
+        private double length;
         private Color style;
 
-        public ExtraData(long length, Color style) {
+        public ExtraData(double length, Color style) {
             super();
             this.length = length;
             this.style = style;
@@ -47,11 +49,11 @@ public class TimeChart extends XYChart<Number, String> {
             this.style = style;
         }
 
-        public long getLength() {
+        public double getLength() {
             return length;
         }
 
-        public void setLength(long length) {
+        public void setLength(double length) {
             this.length = length;
         }
     }
@@ -60,27 +62,49 @@ public class TimeChart extends XYChart<Number, String> {
                      @NamedArg("yAxis") CategoryAxis appAxis) {
         super(timeAxis, appAxis);
         setData(FXCollections.observableArrayList());
-        timeAxis.setLowerBound(minHour * 60 * 60);
+        timeAxis.setLowerBound(minHour);
         setLegendVisible(false);
 
-        // oś czasu przechowuje sekundy dnia i wyświetla je po formatowaniu do stringa
-        timeAxis.setUpperBound(maxHour * 60 * 60);
-        timeAxis.setTickUnit(30 * 60);
+        // oś czasu przechowuje godziny dnia ( double 0-24) i wyświetla je po formatowaniu do stringa
+        // wczesniej przechowywalismy sekundy ale tak Ticki beda sie przemieszczac z przesuwaniem
+        timeAxis.setUpperBound(maxHour);
+        timeAxis.setTickUnit(1.0);
 
         timeAxis.setTickLabelFormatter(new StringConverter<Number>() {
             @Override
             public String toString(Number object) {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // koniecznie UTC. tylko do formatowania!
-                long value = object.longValue();
+                long value = (long) (object.doubleValue() * 3600.0 * 1000.0);
                 // zamiana s na ms
-                return sdf.format(new Date(value * 1000));
+                return sdf.format(new Date(value));
             }
 
             @Override
             public Number fromString(String string) {
                 return 0L;
             }
+        });
+
+        final double[] lastMouseX = {0};
+
+        setOnMousePressed(event -> lastMouseX[0] = event.getX());
+
+        setOnMouseDragged(event -> {
+            event.consume();
+            double pastMinHour = timeAxis.getLowerBound();
+            double pastMaxHour = timeAxis.getUpperBound();
+
+            double delta = (lastMouseX[0] - event.getX()) / timeAxis.getWidth() * (maxHour - minHour);
+            if (pastMinHour + delta < 0)
+                delta = -1 * pastMinHour;
+            else if (pastMaxHour + delta > 24) {
+                delta = -1 * pastMaxHour + 24;
+            }
+            timeAxis.setLowerBound(pastMinHour + delta);
+            timeAxis.setUpperBound(pastMaxHour + delta);
+
+            lastMouseX[0] = event.getX();
         });
     }
 
@@ -99,17 +123,23 @@ public class TimeChart extends XYChart<Number, String> {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+        for (Series series : seriesMap.values()) {
+            series.getData().clear();
+        }
+
         for (RunningPeriodEntity ent : results) {
             XYChart.Series series = seriesMap.get(ent.getApplicationId());
-            Long start = 0L;
-            Long length = 1L;
+            Double start = 0.0;
+            Double length = 1.0;
             try {
-                Long end = sdf.parse(ent.getEndTime()).getTime() % 86400000L / 1000L;
-                start = sdf.parse(ent.getStartTime()).getTime() % 86400000L / 1000L;
+                Double end = (double) sdf.parse(ent.getEndTime()).getTime() % 86400000 / 1000.0;
+                start = (double) sdf.parse(ent.getStartTime()).getTime() % 86400000 / 1000.0;
                 length = end - start; // czas w sekundach
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            start /= 3600.0;
+            length /= 3600.0;
             String appName = appNames.get(ent.getApplicationId());
             series.getData().add(new XYChart.Data<Number, String>(start, appName, new ExtraData(length, Color.RED)));
         }
