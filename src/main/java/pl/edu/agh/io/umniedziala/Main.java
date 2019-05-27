@@ -30,7 +30,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        new ActiveApplicationListener().start();
+        new ActiveApplicationListener(1000).start();
         launch(args);
     }
 }

@@ -1,6 +1,8 @@
 package pl.edu.agh.io.umniedziala.activeApplicationMonitor;
 
 import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
+import pl.edu.agh.io.umniedziala.model.ApplicationEntity;
+import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -9,30 +11,52 @@ import java.util.Date;
 
 public class ApplicationRunningPeriodsManager {
 
-    public ApplicationRunningPeriodsManager() { }
+    public ApplicationRunningPeriodsManager() {
 
+        // when program is shutting down try to update database
+        Runtime.getRuntime().addShutdownHook(new Thread(this::handleCurrentRunningPeriod));
+    }
 
-    private String lastApplicationCheckedName = null;
+    private String lastApplicationCheckedName = null;   // if null => dont update | if not null => update
+
+    private String startTime;
     private int lastRunningPeriodId;
 
     public void handleApplicationRunningPeriod(String applicationName) {
 
-        if (isThisApplicationMonitored(applicationName)) {
+        if(isThisApplicationMonitored((applicationName))) {
             if (applicationName.equals(lastApplicationCheckedName)) {
-                updateCurrentRunningPeriod();
+                // update record
+                updateRunningPeriodInDatabase();
             } else {
+                // add new record
                 lastApplicationCheckedName = applicationName;
-
-                createNewRunningPeriod();
+                startNewRunningPeriod();
             }
         } else {
             lastApplicationCheckedName = null;
         }
-
     }
 
-    private boolean isThisApplicationMonitored(String applicationName) {
+    private void handleCurrentRunningPeriod() {
+        if (lastApplicationCheckedName != null)
+            updateRunningPeriodInDatabase();
+    }
 
+    private void startNewRunningPeriod() {
+        startTime = getCurrentDateTime();
+
+        int applicationId = ApplicationEntity.findByName(lastApplicationCheckedName).get().getId();
+
+        lastRunningPeriodId = RunningPeriodEntity.create(startTime, startTime, applicationId).get().getId();
+    }
+
+    private void updateRunningPeriodInDatabase() {
+        RunningPeriodEntity.update(lastRunningPeriodId, startTime, getCurrentDateTime());
+    }
+
+
+    private boolean isThisApplicationMonitored(String applicationName) {
         try {
             return QuerryExecutor
                     .read(String.format("SELECT * FROM application WHERE name = '%s'", applicationName))
@@ -42,43 +66,7 @@ public class ApplicationRunningPeriodsManager {
         }
 
         return false;
-
     }
-
-    private void updateCurrentRunningPeriod() {
-        try {
-            QuerryExecutor
-                    .update(String.format("UPDATE running_period "
-                        + "SET end_time = '%s' "
-                        + "WHERE id = %d"
-                            , getCurrentDateTime(), lastRunningPeriodId)
-                    );
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void createNewRunningPeriod() {
-        try {
-            int lastApplicationCheckedId = QuerryExecutor
-                    .read(String.format("SELECT id FROM application WHERE name = '%s'", lastApplicationCheckedName))
-                    .getInt("id");
-
-            lastRunningPeriodId = QuerryExecutor.createAndObtainId(
-                    String.format(
-                            "INSERT INTO running_period (start_time, end_time, application_id) " +
-                            "VALUES('%s', '%s', %d)"
-                            , getCurrentDateTime(), getCurrentDateTime(), lastApplicationCheckedId
-                    )
-            );
-
-        } catch (SQLException e) {
-            System.err.println("Couldnt create new running period");
-            e.printStackTrace();
-        }
-    }
-
 
     private String getCurrentDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
