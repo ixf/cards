@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="250.0" maxWidth="325.0" minHeight="250.0" minWidth="325.0" prefHeight="250.0" prefWidth="325.0" scaleShape="false" xmlns="http://javafx.com/javafx/8.0.192" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.ReportGenerationViewController">
+   <children>
+      <Label layoutX="25.0" layoutY="32.0" text="Choose dates">
+         <font>
+            <Font size="24.0" />
+         </font></Label>
+      <DatePicker fx:id="fromDate" layoutX="117.0" layoutY="92.0" onAction="#fromPickedHandler" />
+      <Label layoutX="63.0" layoutY="168.0" text="to:" />
+      <Label layoutX="55.0" layoutY="97.0" text="from:" />
+      <DatePicker fx:id="toDate" layoutX="117.0" layoutY="163.0" onAction="#toPickedHandler" />
+      <Button fx:id="generate" layoutX="236.0" layoutY="209.0" mnemonicParsing="false" onAction="#generateHandler" text="Generate" />
+      <Label fx:id="errorText" layoutX="63.0" layoutY="214.0" textFill="RED" />
+   </children>
+</AnchorPane>
