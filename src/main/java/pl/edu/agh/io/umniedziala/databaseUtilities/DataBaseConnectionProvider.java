@@ -68,7 +68,9 @@ public class DataBaseConnectionProvider {
                     " id integer not null primary key autoincrement," +
                     " name varchar(120) default \"blank\" not null," +
                     " start_time datetime not null," +
-                    " end_time datetime not null" +
+                    " end_time datetime not null," +
+                    " description text default \"No description\"," +
+                    " color varchar(10) default \"#000000\" not null" +
                     ");");
         } catch (SQLException e) {
             System.err.println("Couldnt create table custom_event");
