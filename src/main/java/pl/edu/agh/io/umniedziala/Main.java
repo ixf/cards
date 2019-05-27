@@ -3,6 +3,7 @@ package pl.edu.agh.io.umniedziala;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import pl.edu.agh.io.umniedziala.monitors.activeApplicationMonitor.ActiveApplicationListener;
+import pl.edu.agh.io.umniedziala.monitors.compuerMonitor.ActivityListener;
 import pl.edu.agh.io.umniedziala.viewController.AppController;
 
 import java.io.IOException;
@@ -19,6 +20,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
         activeApplicationListener = new ActiveApplicationListener(1000);
         activeApplicationListener.start();
+
+        ActivityListener activityListener = new ActivityListener();
+        activityListener.start();
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("WorkMonitor");
