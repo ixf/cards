@@ -8,23 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RunningPeriodEntity {
+public class BackgroundPeriodEntity {
 
-    public static final String TABLE_NAME = "running_period";
+    public static final String TABLE_NAME = "background_period";
 
     private final int id;
     private final String startTime;
     private final String endTime;
     private final int applicationId;
 
-    public RunningPeriodEntity(final int id, final String startTime, final String endTime, final int applicationId) {
+    public BackgroundPeriodEntity(final int id, final String startTime, final String endTime, final int applicationId) {
         this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
         this.applicationId = applicationId;
     }
 
-    public static Optional<RunningPeriodEntity> create(final String startTime, final String endTime, final int applicationId) {
+    public static Optional<BackgroundPeriodEntity> create(final String startTime, final String endTime, final int applicationId) {
         String insertSql = String.format(
                 "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', %d)"
                 , TABLE_NAME, Columns.START_TIME, Columns.END_TIME, Columns.APPLICATION_ID
@@ -39,7 +39,7 @@ public class RunningPeriodEntity {
             e.printStackTrace();
         }
 
-        return RunningPeriodEntity.findById(id);
+        return BackgroundPeriodEntity.findById(id);
     }
 
 
@@ -59,12 +59,12 @@ public class RunningPeriodEntity {
         }
     }
 
-    public static Optional<RunningPeriodEntity> findById(final int id) {
+    public static Optional<BackgroundPeriodEntity> findById(final int id) {
         String findByIdSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.ID, id);
 
         try {
             ResultSet rs = QuerryExecutor.read(findByIdSql);
-            return returnRunningPeriod(rs);
+            return returnBackgroundPeriod(rs);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -72,7 +72,7 @@ public class RunningPeriodEntity {
         return Optional.empty();
     }
 
-    public static List<RunningPeriodEntity> findByStartDate(final String startDate, final String appName) {
+    public static List<BackgroundPeriodEntity> findByStartDate(final String startDate, final String appName) {
         String findByStartDateSql = String.format(
                 "SELECT * FROM %s " +
                         "INNER JOIN %s ON %s.%s = %s.%s " +
@@ -93,11 +93,11 @@ public class RunningPeriodEntity {
             e.printStackTrace();
         }
 
-        List<RunningPeriodEntity> resutList = new ArrayList<>();
+        List<BackgroundPeriodEntity> resutList = new ArrayList<>();
         if (rs.isPresent()) {
             try {
                 while (rs.get().next()) {
-                    resutList.add(new RunningPeriodEntity(
+                    resutList.add(new BackgroundPeriodEntity(
                             rs.get().getInt(Columns.ID),
                             rs.get().getString(Columns.START_TIME),
                             rs.get().getString(Columns.END_TIME),
@@ -115,9 +115,9 @@ public class RunningPeriodEntity {
 
 
 
-    public static Optional<RunningPeriodEntity> returnRunningPeriod(ResultSet rs) {
+    public static Optional<BackgroundPeriodEntity> returnBackgroundPeriod(ResultSet rs) {
         try {
-            return Optional.of(new RunningPeriodEntity(
+            return Optional.of(new BackgroundPeriodEntity(
                     rs.getInt(Columns.ID),
                     rs.getString(Columns.START_TIME),
                     rs.getString(Columns.END_TIME),
