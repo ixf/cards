@@ -1,12 +1,18 @@
 package pl.edu.agh.io.umniedziala;
 
+import pl.edu.agh.io.umniedziala.ReportsGenerator.BasicReport;
+import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
+import pl.edu.agh.io.umniedziala.model.ApplicationEntity;
+import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import pl.edu.agh.io.umniedziala.monitors.activeApplicationMonitor.ActiveApplicationListener;
-import pl.edu.agh.io.umniedziala.monitors.compuerMonitor.ActivityListener;
 import pl.edu.agh.io.umniedziala.viewController.AppController;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class Main extends Application {
 
@@ -14,25 +20,17 @@ public class Main extends Application {
 
     private AppController appController;
 
-    private ActiveApplicationListener activeApplicationListener;
-
     @Override
     public void start(Stage primaryStage) throws IOException {
-        activeApplicationListener = new ActiveApplicationListener(1000);
-        activeApplicationListener.start();
-
-        ActivityListener activityListener = new ActivityListener();
-        activityListener.start();
-
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("WorkMonitor");
-        this.primaryStage.setOnCloseRequest(event -> activeApplicationListener.stop());
 
         this.appController = new AppController(primaryStage);
         this.appController.initRootLayout();
     }
 
     public static void main(String[] args) {
+        new ActiveApplicationListener().start();
         launch(args);
     }
 }
