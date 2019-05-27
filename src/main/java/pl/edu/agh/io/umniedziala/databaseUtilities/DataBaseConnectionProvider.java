@@ -31,7 +31,7 @@ public class DataBaseConnectionProvider {
                     "  id integer not null primary key autoincrement," +
                     "  name  varchar(100) not null," +
                     "  application_path text not null, " +
-                    "  color integer" +
+                    "  color varchar(10) default \"#000000\" not null" +
                     ");");
         } catch (SQLException e) {
             System.err.println("Couldnt create application table");
@@ -51,6 +51,44 @@ public class DataBaseConnectionProvider {
             System.err.println("Couldnt create table running_period");
             e.printStackTrace();
         }
+
+        try {
+            QuerryExecutor.create("create table if not exists computer_running_period(" +
+                    "  id integer not null primary key autoincrement," +
+                    "  start_time datetime not null," +
+                    "  end_time datetime not null" +
+                    ");");
+        } catch (SQLException e) {
+            System.err.println("Couldnt create table computer_running_period");
+            e.printStackTrace();
+        }
+
+        try {
+            QuerryExecutor.create("create table if not exists custom_event(" +
+                    " id integer not null primary key autoincrement," +
+                    " name varchar(120) default \"blank\" not null," +
+                    " start_time datetime not null," +
+                    " end_time datetime not null" +
+                    ");");
+        } catch (SQLException e) {
+            System.err.println("Couldnt create table custom_event");
+            e.printStackTrace();
+        }
+
+        try {
+            QuerryExecutor.create("create table if not exists background_period(" +
+                    " id integer not null primary key autoincrement," +
+                    " start_time datetime not null," +
+                    " end_time datetime not null," +
+                    " application_id int not null" +
+                    "    constraint application_id___fk" +
+                    "    references application" +
+                    ");");
+        } catch (SQLException e) {
+            System.err.println("Couldnt create table background_period");
+            e.printStackTrace();
+        }
+
     }
 
     private DataBaseConnectionProvider() {

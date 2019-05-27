@@ -3,6 +3,7 @@ package pl.edu.agh.io.umniedziala;
 import pl.edu.agh.io.umniedziala.ReportsGenerator.BasicReport;
 import pl.edu.agh.io.umniedziala.activeApplicationMonitor.ActiveApplicationListener;
 import pl.edu.agh.io.umniedziala.model.ApplicationEntity;
+import pl.edu.agh.io.umniedziala.model.BackgroundPeriodEntity;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import javafx.application.Application;
 import javafx.stage.Stage;
