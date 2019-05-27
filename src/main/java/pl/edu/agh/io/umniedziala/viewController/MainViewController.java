@@ -8,38 +8,26 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import pl.edu.agh.io.umniedziala.ManagingApplicationsController;
 import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
-import pl.edu.agh.io.umniedziala.model.ComputerRunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.view.TimeChart;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
-
-import static pl.edu.agh.io.umniedziala.databaseUtilities.DataBaseConnectionProvider.getConnection;
 
 public class MainViewController {
     private AppController appController;

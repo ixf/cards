@@ -1,4 +1,4 @@
-package pl.edu.agh.io.umniedziala;
+package pl.edu.agh.io.umniedziala.monitors.compuerMonitor;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.mouse.NativeMouseEvent;

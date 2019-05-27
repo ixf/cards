@@ -1,4 +1,4 @@
-package pl.edu.agh.io.umniedziala;
+package pl.edu.agh.io.umniedziala.viewController;
 
 import pl.edu.agh.io.umniedziala.model.ApplicationEntity;
 
