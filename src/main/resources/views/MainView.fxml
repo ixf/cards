@@ -54,6 +54,11 @@
                               <Image url="/images/logo.jpg" />
                            </image>
                         </ImageView>
+                        <ImageView fx:id="menuBar" fitHeight="43.0" fitWidth="37.0" layoutX="549.0" layoutY="13.0" onMouseClicked="#handleMenuBar" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="/images/menu.jpg" />
+                           </image>
+                        </ImageView>
                      </children>
                   </Pane>
                </top>

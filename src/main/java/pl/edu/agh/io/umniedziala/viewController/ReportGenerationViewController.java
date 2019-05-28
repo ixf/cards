@@ -8,6 +8,7 @@ package pl.edu.agh.io.umniedziala.viewController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
@@ -39,6 +40,10 @@ public class ReportGenerationViewController {
     @FXML
     private Button generate;
 
+    @FXML
+    private CheckBox generateReportApp;
+
+
     public void setAppController(AppController appController) {
         this.appController = appController;
     }
@@ -64,11 +69,11 @@ public class ReportGenerationViewController {
         if( fromSet && toSet){
             try {
                 BasicReport basicReport = new BasicReport(from,to);
-                basicReport.run();
+                if (generateReportApp.isSelected()) basicReport.createReportWithApps();
+                else basicReport.createReportWithoutApps();
             } catch (IOException e){
                 errorText.setText("Report not generated");
             }
-            System.out.println("report generated");
             stage.close();
         } else {
             errorText.setText("Choose from and to date!");

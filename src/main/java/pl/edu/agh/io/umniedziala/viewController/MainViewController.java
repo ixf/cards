@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -74,6 +75,9 @@ public class MainViewController {
 
     @FXML
     private Button generate_report;
+
+    @FXML
+    private ImageView menuBar;
 
     @FXML
     public void initialize(){
@@ -159,10 +163,14 @@ public class MainViewController {
         }
     }
 
-
     @FXML
     public void handleReportGeneration(ActionEvent event){
         appController.showReportGenerationWindow();
+    }
+
+    @FXML
+    public void handleMenuBar(MouseEvent event){
+
     }
 
 }
