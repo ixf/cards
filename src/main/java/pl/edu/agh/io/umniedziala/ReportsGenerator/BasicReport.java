@@ -2,51 +2,44 @@ package pl.edu.agh.io.umniedziala.ReportsGenerator;
 
 import com.opencsv.CSVWriter;
 
+import javafx.util.Pair;
 import pl.edu.agh.io.umniedziala.model.ReportEntryEntity;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import static java.util.stream.Collectors.*;
 
 public class BasicReport {
 
     File file;
     FileWriter outputFile;
     CSVWriter writer;
-    private final String LONG_SPACE = "                           ";
-    private final String MID_SPACE = "     ";
-    private final String SHORT_SPACE = "  ";
     LocalDate from;
     LocalDate to;
 
-    public BasicReport(String filePath) throws IOException {
-        try {
-            file = new File(filePath);
-            outputFile = new FileWriter(file);
-            writer = new CSVWriter(outputFile, '|');
-            writeHeader();
-        }
-        catch(IOException e) {
-            throw new IOException(e.getMessage());
-        }
-    }
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    public static String basicHeader = "date,start time,end time,duration";
+    public static String extendedHeader = basicHeader+",app name,start,end";
+    FilesOperations fileOperator;
 
     public BasicReport(LocalDate from, LocalDate to) throws IOException {
         try {
             String filePath = "./report_" + from.toString() + "_" + to.toString()+".csv";
             file = new File(filePath);
             outputFile = new FileWriter(file);
-            writer = new CSVWriter(outputFile, '|');
-            writeHeader();
+            writer = new CSVWriter(outputFile,  CSVWriter.DEFAULT_SEPARATOR,
+                    CSVWriter.NO_QUOTE_CHARACTER,
+                    CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                    CSVWriter.DEFAULT_LINE_END);
+            fileOperator = new FilesOperations(writer);
             this.from = from;
             this.to = to;
         }
@@ -55,99 +48,173 @@ public class BasicReport {
         }
     }
 
-    public void run() {
-        writeToFile(from.toString(),to.toString());
-        close();
+    public void createReportWithApps() {
+        getReportWithApps(from.toString(),to.toString());
+        fileOperator.close();
     }
 
-    public void writeHeader(){
-        writeDashLine();
-        writer.writeNext(String.format("%s WorkMonitor %s,%s REPORT",LONG_SPACE,SHORT_SPACE,SHORT_SPACE).split(","),false);
+    public void createReportWithoutApps() {
+        getReportWithoutApps(from.toString(),to.toString());
+        fileOperator.close();
     }
 
-     public void writeDashLine(){
-        writer.writeNext("------------------------------------------------------------------------------------------".split(" "),false);
-     }
 
-     public void writeMetadata(){
-        writeDashLine();
-        writer.writeNext(("    application name ,     date     ,   total time  , active time ,  start time   ,   end time ").split(","),false);
-        writeDashLine();
-    }
 
-    public void writeDateRangeOfReport(String from, String to){
+    public void getReportWithoutApps(String from, String to){
 
-        writeDashLine();
-        writer.writeNext(String.format("%s REPORT RANGE  ,  from %s to  %s",LONG_SPACE,from,to).split(","),false);
-    }
+        TreeMap<Date,Pair<Date,Date>> timeIntervals = new TreeMap<>();
 
-    public void addBlanks(String[] line){
-        for(int i = 0; i<line.length;i++){
-            String tmp = MID_SPACE;
-            tmp += line[i];
-            tmp += MID_SPACE;
-            line[i] = tmp;
+        fileOperator.writeDateRangeOfReport(from, to);
+        fileOperator.writeMetadata(String.format(basicHeader).split(","));
+
+        List<ReportEntryEntity> entities = parseResultSet(ReportEntryEntity.getReportEntries(from,to));
+        Map<Date,List<ReportEntryEntity>> entitiesGroupedByDate =
+                entities.stream()
+                        .collect(groupingBy(ReportEntryEntity::getDate,toList()));
+
+        for(Map.Entry<Date,List<ReportEntryEntity>> e : entitiesGroupedByDate.entrySet()){
+
+            ArrayList<Date> startTimes = new ArrayList();
+            ArrayList<Date> endTimes = new ArrayList();
+            for(ReportEntryEntity r : e.getValue()){
+                startTimes.add(r.getStartTime());
+                endTimes.add(r.getEndTime());
+            }
+
+            Date start = Collections.min(startTimes);
+            Date end = Collections.max(endTimes);
+
+            timeIntervals.put(e.getKey(),new Pair<>(start,end));
         }
+        fileOperator.writeToFile(formatReportWithoutApps(timeIntervals));
     }
 
+    public void getReportWithApps(String from, String to){
 
-    public void writeToFile(String from, String to){
-        List<String []> allRows = new ArrayList<>();
+        TreeMap<Date, DayEntry> appsTimeIntervals = new TreeMap<>();
 
-        writeDateRangeOfReport(from, to);
-        writeMetadata();
-        allRows = parseResultSet(ReportEntryEntity.getReportEntries(from,to));
-        allRows.forEach(e -> addBlanks(e));
-        allRows.forEach(e -> writer.writeNext(e, false));
+        fileOperator.writeDateRangeOfReport(from, to);
+        fileOperator.writeMetadata(String.format(extendedHeader).split(","));
 
-    }
-    public void close(){
-        try {
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        List<ReportEntryEntity> entities = parseResultSet(ReportEntryEntity.getReportEntries(from,to));
+        Map<Date,List<ReportEntryEntity>> entitiesGroupedByDate =
+                entities.stream()
+                        .collect(groupingBy(ReportEntryEntity::getDate,toList()));
 
-    public static List<String []> parseResultSet(ResultSet result){
+        for(Map.Entry<Date,List<ReportEntryEntity>> e : entitiesGroupedByDate.entrySet()){
 
-        ReportEntryEntity tmp = new ReportEntryEntity();
-        List<String []> allRows = new ArrayList<>();
+            ArrayList<Date> startTimes = new ArrayList();
+            ArrayList<Date> endTimes = new ArrayList();
+            Map<String,Pair<TreeSet<Date>,TreeSet<Date>>> apps = new TreeMap<>();
+            Map<String,Pair<Date,Date>> appsWithTimes = new TreeMap<>();
 
-        try {
-            ResultSetMetaData resultmd = result.getMetaData();
-            System.out.println(result.next());
-            while(result.next()){
-
-                String[] currentRow;
-                tmp.setApplicationName(result.getString(result.findColumn("name")));
-                tmp.setDate(result.getString(result.findColumn("start_time")).split(" ")[0]);
-                tmp.setStartTime(result.getString(result.findColumn("start_time")).split(" ")[1]);
-                tmp.setEndTime(result.getString(result.findColumn("end_time")).split(" ")[1]);
-
-                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-                Date firstDate = null;
-                Date secondDate = null;
-                try {
-                    firstDate = sdf.parse(tmp.getStartTime());
-                    secondDate = sdf.parse(tmp.getEndTime());
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            for(ReportEntryEntity r : e.getValue()){
+                startTimes.add(r.getStartTime());
+                endTimes.add(r.getEndTime());
+                if(!apps.keySet().contains(r.getApplicationName())){
+                    apps.put(r.getApplicationName(),new Pair<>(new TreeSet<>(),new TreeSet<>()));
                 }
+                apps.get(r.getApplicationName()).getValue().add(r.getStartTime());
+                apps.get(r.getApplicationName()).getValue().add(r.getStartTime());
+            }
 
-                long diffInMillies = Math.abs(secondDate.getTime() - firstDate.getTime());
-                Long diff = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            apps.forEach((x,y) -> appsWithTimes.put(x,new Pair<>(y.getValue().first(),y.getValue().last())));
+            appsTimeIntervals.put(e.getKey(),new DayEntry(Collections.min(startTimes),Collections.max(endTimes),appsWithTimes));
+        }
 
-                tmp.setWorkingHours(diff.toString());
-                tmp.setActiveWorkingHours("8.25");
+        fileOperator.writeToFile(formatReportWithAppps(appsTimeIntervals));
+    }
 
-                currentRow = tmp.toString().split(" ");
-                allRows.add(currentRow);
+    private List<String> formatReportWithoutApps(Map<Date,Pair<Date,Date>> entries){
+
+        List<String> timeIntervalsStrings = new ArrayList<>();
+
+        for(Map.Entry<Date,Pair<Date,Date>> s : entries.entrySet()){
+
+            timeIntervalsStrings.add(String.format("%s#%s#%s#%.1f",dateFormat.format(s.getKey()),
+                    timeFormat.format(s.getValue().getKey()),
+                    timeFormat.format(s.getValue().getValue()),
+                    findTimeDiff(s.getValue().getKey(),s.getValue().getValue())/60)
+                    .replace(',','.'));
+        }
+        return timeIntervalsStrings;
+    }
+
+    private List<String> formatReportWithAppps(Map<Date,DayEntry> entries){
+
+        List<String> timeIntervalsAndAppsString = new ArrayList<>();
+        for(Map.Entry<Date, DayEntry> s : entries.entrySet()){
+
+            String appsList = "";
+
+            for (Map.Entry<String,Pair<Date,Date>> x : s.getValue().getApplicationsList().entrySet()){
+                appsList = appsList+(String.format("%s#%s#%s#",x.getKey(),
+                        timeFormat.format(x.getValue().getKey()),
+                        timeFormat.format(x.getValue().getValue())));
+            }
+
+            timeIntervalsAndAppsString.add(String.format("%s#%s#%s#%.1f#%s",dateFormat.format(s.getKey()),
+                    timeFormat.format(s.getValue().getStart()),
+                    timeFormat.format(s.getValue().getEnd()),
+                    findTimeDiff(s.getValue().getStart(),s.getValue().getEnd())/60,
+                    appsList).replace(',','.'));
+        }
+        return timeIntervalsAndAppsString;
+    }
+
+    public static List<ReportEntryEntity> parseResultSet(ResultSet result){
+
+        List<ReportEntryEntity> entities = new ArrayList<>();
+
+        try {
+            while(result.next()){
+                ReportEntryEntity tmp = new ReportEntryEntity();
+
+                tmp.setApplicationName(result.getString(result.findColumn("name")));
+                tmp.setDate(dateFormat.parse(result.getString(result.findColumn("start_time")).split(" ")[0]));
+                tmp.setStartTime(timeFormat.parse(result.getString(result.findColumn("start_time")).split(" ")[1]));
+                tmp.setEndTime(timeFormat.parse(result.getString(result.findColumn("end_time")).split(" ")[1]));
+
+                entities.add(tmp);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        return allRows;
+        return entities;
+    }
+
+    private float findTimeDiff(Date start,Date end){
+
+        long diffInMillies = Math.abs(end.getTime() - start.getTime());
+        float diff = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        return diff;
+
+    }
+
+    public class DayEntry{
+
+        Date start;
+        Date end;
+        Map<String,Pair<Date,Date>> applicationsList;
+
+        public DayEntry(Date start, Date end, Map<String,Pair<Date,Date>> applicationsList) {
+            this.start = start;
+            this.end = end;
+            this.applicationsList = applicationsList;
+        }
+
+        public Date getStart() {
+            return start;
+        }
+
+        public Date getEnd() {
+            return end;
+        }
+
+        public Map<String,Pair<Date,Date>> getApplicationsList() {
+            return applicationsList;
+        }
     }
 }
