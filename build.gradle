@@ -36,4 +36,5 @@ dependencies {
     compile 'com.opencsv:opencsv:4.6'
     compile group: 'net.java.dev.jna', name: 'jna-platform', version: '5.3.1'
 
+    compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 }

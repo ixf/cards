@@ -1,0 +1,7 @@
+[meta]
+config-version = "1.0"
+
+[monitor]
+interval-seconds = 15
+
+
