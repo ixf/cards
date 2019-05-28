@@ -1,7 +1,7 @@
 [meta]
-config-version = "1.0"
+config_version = "1.0"
 
 [monitor]
-interval-seconds = 15
+refresh_interval = 15
 
 
