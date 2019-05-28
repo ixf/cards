@@ -25,7 +25,7 @@ public class GeneralConfigurationManager {
         return instance;
     }
 
-    private void read() throws ConfigurationException {
+    private synchronized void read() throws ConfigurationException {
 
         URL defaultConfigFileUrl = Objects.requireNonNull(
                 getClass().getClassLoader().getResource(DEFAULT_CONFIGURATION_PATH)
@@ -48,7 +48,7 @@ public class GeneralConfigurationManager {
         this.save();
     }
 
-    private void save() {
+    private synchronized void save() {
         TomlWriter tw = new TomlWriter();
         try {
             tw.write(configuration.toMap(), CONFIGURATION_FILE);

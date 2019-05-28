@@ -8,7 +8,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class ConfigurationTests {
 
-    Configuration config;
+    private Configuration config;
 
     @Test
     @Before
@@ -18,6 +18,6 @@ public class ConfigurationTests {
 
     @Test
     public void valueGettingTest() {
-        assertNotNull(config.getRefreshInterval());
+        assertNotNull(config.getCheckInterval());
     }
 }

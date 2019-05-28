@@ -5,6 +5,7 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
+import pl.edu.agh.io.umniedziala.configuration.Configuration;
 import pl.edu.agh.io.umniedziala.model.ComputerRunningPeriodEntity;
 
 import java.text.DateFormat;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 
 public class ActivityListener extends Thread implements NativeMouseInputListener, NativeKeyListener {
 
-    private long inactivityDuration = 5;
+    private long inactivityDuration;
 
     private static long startTime;
 
@@ -28,6 +29,10 @@ public class ActivityListener extends Thread implements NativeMouseInputListener
 
     private int lastRunningPeriodId;
     private String start;
+
+    public ActivityListener() {
+        inactivityDuration = Configuration.getInstance().getInactivityPeriod();
+    }
 
     public void nativeMouseClicked(NativeMouseEvent e) {
         startTime = System.nanoTime();
