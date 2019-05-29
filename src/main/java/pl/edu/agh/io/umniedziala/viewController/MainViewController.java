@@ -33,7 +33,7 @@ public class MainViewController {
     DateFormat dateFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
     final FileChooser fileChooser = new FileChooser();
     ManagingApplicationsController managingApplicationsController;
-    final static int DEFAULT_COLOR = 0;
+    final static String DEFAULT_COLOR = "#000000";
 
     private Date currentDate;
 
