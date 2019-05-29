@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 public class ActiveApplicationListener extends Thread {
     private static final Logger logger = Logger.getLogger(ActiveApplicationListener.class.getName());
 
-    private final int MAX_TITLE_LENGTH = 1024;
-
     private final ApplicationRunningPeriodsManager programRunningPeriodsManager;
     private int checkingIntervalInMs;
     private volatile boolean exit = false;
@@ -27,6 +25,7 @@ public class ActiveApplicationListener extends Thread {
     }
 
     public void run() {
+        logger.info("Running active application listener");
         while (!exit) {
             Optional<String> windowName = Optional.empty();
             try {
@@ -52,8 +51,12 @@ public class ActiveApplicationListener extends Thread {
                 e.printStackTrace();
             }
         }
+        logger.info("Stopping active application listener");
     }
 
+    public void stopListening() {
+        this.exit = true;
+    }
 
     private String getCurrentActiveWindowName() throws ActiveWindowNotFound {
         WinDef.HWND hwnd = User32.INSTANCE.GetForegroundWindow();

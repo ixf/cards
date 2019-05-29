@@ -26,7 +26,7 @@ public class Main extends Application {
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("WorkMonitor");
-        this.primaryStage.setOnCloseRequest(event -> activeApplicationListener.stop());
+        this.primaryStage.setOnCloseRequest(event -> activeApplicationListener.stopListening());
 
         this.appController = new AppController(primaryStage);
         this.appController.initRootLayout();
