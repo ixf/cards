@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<?import pl.edu.agh.io.umniedziala.view.DateTimePicker?>
+
+<AnchorPane maxHeight="431.0" maxWidth="373.0" minHeight="400.0" minWidth="373.0" prefHeight="431.0" prefWidth="373.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.CustomEventController">
+   <children>
+      <Pane layoutX="-2.0" layoutY="-1.0" prefHeight="65.0" prefWidth="379.0" style="-fx-background-color: #436791 #436791;">
+         <children>
+            <Label layoutX="17.0" layoutY="17.0" prefHeight="31.0" prefWidth="177.0" text="Custom event" textFill="WHITE">
+               <font>
+                  <Font name="Trebuchet MS" size="26.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+      <Label layoutX="30.0" layoutY="135.0" text="Start time">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="30.0" layoutY="181.0" text="End time">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="30.0" layoutY="92.0" text="Name">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="30.0" layoutY="272.0" text="Description">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="32.0" layoutY="225.0" text="Color">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Label>
+      <Button fx:id="saveButton" layoutX="145.0" layoutY="388.0" mnemonicParsing="false" onAction="#handleSaveButton" prefHeight="29.0" prefWidth="83.0" style="-fx-background-color: #436791 #436791 #436791 #436791;" text="Save" textFill="WHITE">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font>
+      </Button>
+      <TextField fx:id="nameInput" layoutX="117.0" layoutY="87.0" onAction="#nameInputHandler" prefHeight="29.0" prefWidth="193.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </TextField>
+      <ColorPicker fx:id="colorPicker" editable="true" layoutX="117.0" layoutY="221.0">
+         <value>
+            <Color blue="0" green="0" red="0" />
+         </value>
+      </ColorPicker>
+      <TextArea fx:id="descriptionInput" layoutX="117.0" layoutY="271.0" prefHeight="71.0" prefWidth="193.0" />
+      <DateTimePicker fx:id="startTime" layoutX="117.0" layoutY="130.0" onAction="#startTimeHandler" />
+       <DateTimePicker fx:id="endTime" layoutX="117.0" layoutY="175.0" onAction="#endTimeHandler" />
+      <Label fx:id="alert" layoutX="72.0" layoutY="357.0" textFill="RED">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></Label>
+   </children>
+</AnchorPane>

@@ -72,4 +72,31 @@ public class AppController {
         }
 
     }
+
+    public void showCustomEventView(){
+        try {
+            // Load the fxml file and create a new stage for the dialog
+            FXMLLoader loader = new FXMLLoader();
+
+            Parent page = loader.load(getClass().getResourceAsStream("/views/CustomEventView.fxml"));
+
+            // Create the dialog Stage.
+            Stage eventStage = new Stage();
+            eventStage.setTitle("Custom event");
+            eventStage.initModality(Modality.WINDOW_MODAL);
+            //reportStage.initOwner(primaryStage);
+            Scene scene = new Scene(page);
+            eventStage.setScene(scene);
+
+            CustomEventController controller = loader.getController();
+            controller.setAppController(this);
+            controller.setStage(eventStage);
+            eventStage.show();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

@@ -187,7 +187,7 @@ public class MainViewController {
 
     @FXML
     public void handleEventButton(ActionEvent event){
-
+        appController.showCustomEventView();
     }
 
 }
