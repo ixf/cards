@@ -15,9 +15,9 @@ public class ApplicationEntity {
     private final int id;
     private final String name;
     private final String applicationPath;
-    private final int color;
+    private final String color;
 
-    private ApplicationEntity(final int id, final String name, final String applicationPath, final int color) {
+    private ApplicationEntity(final int id, final String name, final String applicationPath, final String color) {
         this.id = id;
         this.name = name;
         this.applicationPath = applicationPath;
@@ -104,7 +104,7 @@ public class ApplicationEntity {
                     rs.getInt(Columns.ID),
                     rs.getString(Columns.NAME),
                     rs.getString(Columns.APPLICATION_PATH),
-                    rs.getInt(Columns.COLOR)
+                    rs.getString(Columns.COLOR)
             ));
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,7 +157,7 @@ public class ApplicationEntity {
         return applicationPath;
     }
 
-    public int getColor() {
+    public String getColor() {
         return color;
     }
 
