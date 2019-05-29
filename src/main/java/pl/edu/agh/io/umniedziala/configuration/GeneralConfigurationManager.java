@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
 
 public class GeneralConfigurationManager {
@@ -27,17 +28,7 @@ public class GeneralConfigurationManager {
 
     private synchronized void read() throws ConfigurationException {
 
-        URL defaultConfigFileUrl = Objects.requireNonNull(
-                getClass().getClassLoader().getResource(DEFAULT_CONFIGURATION_PATH)
-        );
-
-        File defaultConfigFile = new File(defaultConfigFileUrl.getFile());
-
-        if (!defaultConfigFile.exists()) {
-            throw new ConfigurationException("Default Configuration File does not exists!");
-        }
-
-        Toml defaultConfig = new Toml().read(defaultConfigFile);
+        Toml defaultConfig = getDefaultConfiguration();
 
         if (!CONFIGURATION_FILE.exists()) {
             configuration = new Toml(defaultConfig);
@@ -48,13 +39,44 @@ public class GeneralConfigurationManager {
         this.save();
     }
 
-    private synchronized void save() {
+    private Toml getDefaultConfiguration() {
+        URL defaultConfigFileUrl = Objects.requireNonNull(
+                getClass().getClassLoader().getResource(DEFAULT_CONFIGURATION_PATH)
+        );
+
+        File defaultConfigFile = new File(defaultConfigFileUrl.getFile());
+
+        if (!defaultConfigFile.exists()) {
+            throw new ConfigurationException("Default Configuration File does not exists!");
+        }
+
+        return new Toml().read(defaultConfigFile);
+    }
+
+    public void resetToDefaults() {
+        configuration = getDefaultConfiguration();
+
+        this.save();
+    }
+
+    public synchronized void save() {
         TomlWriter tw = new TomlWriter();
         try {
             tw.write(configuration.toMap(), CONFIGURATION_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public synchronized void setConfigurationFromMap(Map<String, Object> map) {
+        TomlWriter tw = new TomlWriter();
+        try {
+            tw.write(map, CONFIGURATION_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.read();
     }
 
     public Toml config() {
