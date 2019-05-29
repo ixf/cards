@@ -71,7 +71,7 @@ public class CustomEventController {
     public void handleSaveButton(ActionEvent event){
         if (nameInserted && startTimeInserted && endTimeInserted){
             CustomEventEntity.create(startTime.getDateTimeValue().toString(),endTime.getDateTimeValue().toString(),
-                    nameInput.getText(), descriptionInput.getText(),colorPicker.getCustomColors().toString());
+                    nameInput.getText(), descriptionInput.getText(),colorPicker.getValue().toString());
             stage.close();
         } else{
             alert.setText("Choose start time, end time and name!");
