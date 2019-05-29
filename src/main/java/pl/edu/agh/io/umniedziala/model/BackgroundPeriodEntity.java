@@ -56,6 +56,21 @@ public class BackgroundPeriodEntity extends Period {
         }
     }
 
+    public static void update(final int id, final String endTime) {
+        String updateSql = String.format(
+                "UPDATE %s SET %s = '%s' WHERE %s = %d"
+                , TABLE_NAME
+                , Columns.END_TIME, endTime
+                , Columns.ID, id
+        );
+
+        try {
+            QuerryExecutor.update(updateSql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Optional<BackgroundPeriodEntity> findById(final int id) {
         String findByIdSql = String.format("SELECT * FROM %s WHERE %s = %s", TABLE_NAME, Columns.ID, id);
 
