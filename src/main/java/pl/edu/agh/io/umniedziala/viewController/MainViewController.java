@@ -10,9 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -71,13 +69,22 @@ public class MainViewController {
     private NumberAxis time_axis;
 
     @FXML
-    private Button app_add;
+    private MenuItem appButton;
 
     @FXML
-    private Button generate_report;
+    private MenuItem reportButton;
 
     @FXML
-    private ImageView settingsButton;
+    private MenuItem settingsButton;
+
+    @FXML
+    private MenuButton menuButton;
+
+    @FXML
+    private ImageView menuView;
+
+    @FXML
+    private MenuItem eventButton;
 
     @FXML
     public void initialize(){
@@ -151,7 +158,7 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_app_add(ActionEvent event) {
+    public void handleAppButton(ActionEvent event) {
         List<File> list =
                 fileChooser.showOpenMultipleDialog(new Stage());
         if (list != null){
@@ -164,12 +171,22 @@ public class MainViewController {
     }
 
     @FXML
-    public void handleReportGeneration(ActionEvent event){
+    public void handleReportButton(ActionEvent event){
         appController.showReportGenerationWindow();
     }
 
     @FXML
-    public void handleSettingsButton(MouseEvent event){
+    public void handleSettingsButton(ActionEvent event){
+
+    }
+
+    @FXML
+    public void handleMenuButton(MouseEvent event){
+        menuButton.show();
+    }
+
+    @FXML
+    public void handleEventButton(ActionEvent event){
 
     }
 
