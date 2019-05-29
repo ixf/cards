@@ -42,6 +42,20 @@ public class ApplicationEntity {
         return ApplicationEntity.findById(id);
     }
 
+    public static void updateApplicationColor(final String name, final int color){
+
+        String updateSql = String.format(
+                "UPDATE %s SET %s = %d WHERE %s = %s",
+                TABLE_NAME, Columns.COLOR, color, Columns.NAME, name
+        );
+
+        try {
+            QuerryExecutor.update(updateSql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static Optional<ApplicationEntity> findByName(final String name) {
         String findByNameSql = String.format("SELECT * FROM %s WHERE %s = '%s'", TABLE_NAME, Columns.NAME, name);
 
