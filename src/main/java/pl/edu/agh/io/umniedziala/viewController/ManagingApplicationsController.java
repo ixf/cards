@@ -10,7 +10,7 @@ public class ManagingApplicationsController {
 
     private static final Logger logger = Logger.getLogger(ManagingApplicationsController.class.getName());
 
-    public boolean addNewApplicationByPath(String path, int color) {
+    public boolean addNewApplicationByPath(String path, String color) {
         if (path.length() <= 0) {
             logger.log(Level.WARNING, "Empty path.");
 
