@@ -79,7 +79,13 @@ public class ChooseColorsViewController {
     }
 
     public void handleColorChange(ActionEvent event) {
-        String newColor = colorPicker.getValue().toString();
+        if(changedApp == null)
+            return;
+        Color color = colorPicker.getValue();
+        String newColor = String.format("#%02X%02X%02X",
+                ((int)color.getRed())*255,
+                ((int)color.getGreen())*255,
+                ((int)color.getBlue())*255);
         ApplicationEntity.updateApplicationColor(changedApp.getName(), newColor);
         changedApp.color = newColor;
     }
