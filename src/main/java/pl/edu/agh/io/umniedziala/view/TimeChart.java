@@ -109,6 +109,7 @@ public class TimeChart extends XYChart<Number, String> {
     }
 
     public void setAppNames(Map<Integer, String> appNames) {
+        getData().clear();
         this.appNames = appNames;
         for (Map.Entry<Integer, String> ent : appNames.entrySet()) {
             XYChart.Series series = new XYChart.Series();
