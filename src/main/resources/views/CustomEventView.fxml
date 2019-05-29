@@ -54,7 +54,7 @@
       </Button>
       <TextField fx:id="nameInput" layoutX="117.0" layoutY="87.0" onAction="#nameInputHandler" prefHeight="29.0" prefWidth="193.0">
          <font>
-            <Font size="15.0" />
+            <Font name="Trebuchet MS" size="15.0" />
          </font>
       </TextField>
       <ColorPicker fx:id="colorPicker" editable="true" layoutX="117.0" layoutY="221.0">
@@ -62,7 +62,10 @@
             <Color blue="0" green="0" red="0" />
          </value>
       </ColorPicker>
-      <TextArea fx:id="descriptionInput" layoutX="117.0" layoutY="271.0" prefHeight="71.0" prefWidth="193.0" />
+      <TextArea fx:id="descriptionInput" layoutX="117.0" layoutY="271.0" prefHeight="71.0" prefWidth="193.0" wrapText="true">
+         <font>
+            <Font name="Trebuchet MS" size="15.0" />
+         </font></TextArea>
       <DateTimePicker fx:id="startTime" layoutX="117.0" layoutY="130.0" onAction="#startTimeHandler" />
        <DateTimePicker fx:id="endTime" layoutX="117.0" layoutY="175.0" onAction="#endTimeHandler" />
       <Label fx:id="alert" layoutX="72.0" layoutY="357.0" textFill="RED">

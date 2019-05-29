@@ -7,62 +7,83 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="513.0" maxWidth="599.0" minHeight="513.0" minWidth="599.0" prefHeight="513.0" prefWidth="599.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.SettingsViewController">
+<AnchorPane maxHeight="513.0" maxWidth="599.0" minHeight="513.0" minWidth="599.0" prefHeight="513.0" prefWidth="599.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.SettingsViewController">
    <children>
       <Label layoutX="272.0" layoutY="275.0" text="Charts">
          <font>
-            <Font size="18.0" />
+            <Font name="Trebuchet MS" size="18.0" />
          </font>
       </Label>
       <Label layoutX="225.0" layoutY="76.0" text="Computer activity">
          <font>
-            <Font size="18.0" />
+            <Font name="Trebuchet MS" size="18.0" />
          </font>
       </Label>
       <Label layoutX="244.0" layoutY="312.0" text="start">
          <font>
-            <Font size="14.0" />
+            <Font name="Trebuchet MS" size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="chartStartField" layoutX="292.0" layoutY="308.0" />
+      <TextField fx:id="chartStartField" layoutX="292.0" layoutY="308.0">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></TextField>
       <Label layoutX="168.0" layoutY="117.0" text="checking interval">
          <font>
-            <Font size="14.0" />
+            <Font name="Trebuchet MS" size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="computerActivityField" layoutX="292.0" layoutY="112.0" />
+      <TextField fx:id="computerActivityField" layoutX="292.0" layoutY="112.0">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></TextField>
       <Label layoutX="247.0" layoutY="357.0" text="end">
          <font>
-            <Font size="14.0" />
+            <Font name="Trebuchet MS" size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="chartEndField" layoutX="292.0" layoutY="353.0" />
+      <TextField fx:id="chartEndField" layoutX="292.0" layoutY="353.0">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></TextField>
       <Pane layoutY="-2.0" prefHeight="56.0" prefWidth="600.0" style="-fx-background-color: #436791#436791;">
          <children>
             <Label layoutX="245.0" layoutY="11.0" text="Settings" textFill="WHITE">
                <font>
-                  <Font name="System Italic" size="28.0" />
+                  <Font name="Trebuchet MS" size="28.0" />
                </font>
             </Label>
          </children></Pane>
       <Label layoutX="225.0" layoutY="179.0" text="Application activity">
          <font>
-            <Font size="18.0" />
+            <Font name="Trebuchet MS" size="18.0" />
          </font>
       </Label>
       <Label layoutX="168.0" layoutY="220.0" text="checking interval">
          <font>
-            <Font size="14.0" />
+            <Font name="Trebuchet MS" size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="applicationActivityField" layoutX="292.0" layoutY="215.0" />
-      <Button layoutX="520.0" layoutY="465.0" mnemonicParsing="false" onAction="#handleSave" text="Save" />
-      <Button layoutX="448.0" layoutY="465.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+      <TextField fx:id="applicationActivityField" layoutX="292.0" layoutY="215.0">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></TextField>
+      <Button layoutX="520.0" layoutY="465.0" mnemonicParsing="false" onAction="#handleSave" text="Save">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></Button>
+      <Button layoutX="448.0" layoutY="465.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></Button>
       <Label fx:id="errorLabel" layoutX="254.0" layoutY="437.0" prefHeight="18.0" prefWidth="151.0" textFill="#ff0b0b">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="202.0" layoutY="410.0" mnemonicParsing="false" onAction="#chooseColors" text="Choose colors for tracked applications" />
+      <Button layoutX="202.0" layoutY="410.0" mnemonicParsing="false" onAction="#chooseColors" text="Choose colors for tracked applications">
+         <font>
+            <Font name="Trebuchet MS" size="14.0" />
+         </font></Button>
    </children>
 </AnchorPane>
