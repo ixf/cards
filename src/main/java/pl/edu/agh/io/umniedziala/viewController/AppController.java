@@ -57,7 +57,7 @@ public class AppController {
             Stage reportStage = new Stage();
             reportStage.setTitle("Report Generation");
             reportStage.initModality(Modality.WINDOW_MODAL);
-            //reportStage.initOwner(primaryStage);
+            reportStage.setResizable(false);
             Scene scene = new Scene(page);
             reportStage.setScene(scene);
 
@@ -84,7 +84,7 @@ public class AppController {
             Stage eventStage = new Stage();
             eventStage.setTitle("Custom event");
             eventStage.initModality(Modality.WINDOW_MODAL);
-            //reportStage.initOwner(primaryStage);
+            eventStage.setResizable(false);
             Scene scene = new Scene(page);
             eventStage.setScene(scene);
 
