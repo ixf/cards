@@ -108,14 +108,12 @@ public class CustomEventEntity {
         return Optional.empty();
     }
 
-    public static List<CustomEventEntity> findByStartDate(final String startDate, final String name) {
+    public static List<CustomEventEntity> findByStartDate(final String startDate) {
         String findByStartDateSql = String.format(
                 "SELECT * FROM %s " +
-                        "WHERE %s >= Datetime('%s 00:00:00') and %s <= Datetime('%s 23:59:59') " +
-                        "AND %s = '%s'"
+                        "WHERE %s >= Datetime('%s 00:00:00') and %s <= Datetime('%s 23:59:59') "
                 , TABLE_NAME
                 , Columns.START_TIME, startDate, Columns.START_TIME, startDate
-                , Columns.NAME, name
         );
 
         return getResultList(findByStartDateSql);
