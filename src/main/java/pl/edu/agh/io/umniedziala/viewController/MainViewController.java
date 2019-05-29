@@ -189,8 +189,8 @@ public class MainViewController {
     }
 
     @FXML
-    public void handleSettingsButton(ActionEvent event) {
-
+    public void handleSettingsButton(ActionEvent event){
+        appController.showSettingsWindow();
     }
 
     @FXML
