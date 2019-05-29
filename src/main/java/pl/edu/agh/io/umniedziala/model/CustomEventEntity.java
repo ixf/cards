@@ -8,15 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomEventEntity {
+public class CustomEventEntity extends Period {
     public static final String TABLE_NAME = "custom_event";
 
-    private final int id;
-    private final String startTime;
-    private final String endTime;
-    private final String name;
-    private final String description;
-    private final String color;
+    protected String name;
+    protected String description;
+    protected String color;
 
     public CustomEventEntity(final int id,
                              final String startTime,
@@ -173,6 +170,17 @@ public class CustomEventEntity {
         }
 
         return Optional.empty();
+    }
+
+
+    public String getName() {
+        return name;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public String getColor() {
+        return color;
     }
 
 
