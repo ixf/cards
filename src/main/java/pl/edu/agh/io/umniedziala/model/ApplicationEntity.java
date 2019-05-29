@@ -45,7 +45,7 @@ public class ApplicationEntity {
     public static void updateApplicationColor(final String name, final String color){
 
         String updateSql = String.format(
-                "UPDATE %s SET %s = %s WHERE %s = %s",
+                "UPDATE %s SET %s = '%s' WHERE %s = '%s'",
                 TABLE_NAME, Columns.COLOR, color, Columns.NAME, name
         );
 

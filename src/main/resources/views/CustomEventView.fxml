@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import pl.edu.agh.io.umniedziala.view.DateTimePicker?>
 
-<AnchorPane maxHeight="431.0" maxWidth="373.0" minHeight="400.0" minWidth="373.0" prefHeight="431.0" prefWidth="373.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.CustomEventController">
+<AnchorPane maxHeight="431.0" maxWidth="373.0" minHeight="431.0" minWidth="373.0" prefHeight="431.0" prefWidth="373.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.CustomEventController">
    <children>
       <Pane layoutX="-2.0" layoutY="-1.0" prefHeight="65.0" prefWidth="379.0" style="-fx-background-color: #436791 #436791;">
          <children>
