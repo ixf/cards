@@ -8,14 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RunningPeriodEntity {
+public class RunningPeriodEntity extends Period {
 
     public static final String TABLE_NAME = "running_period";
 
-    private final int id;
-    private final String startTime;
-    private final String endTime;
-    private final int applicationId;
+    protected int applicationId;
 
     public RunningPeriodEntity(final int id, final String startTime, final String endTime, final int applicationId) {
         this.id = id;
@@ -130,17 +127,23 @@ public class RunningPeriodEntity {
         return Optional.empty();
     }
 
-    public int getId() {
-        return id;
-    }
-    public String getStartTime() {
-        return startTime;
-    }
-    public String getEndTime() {
-        return endTime;
-    }
     public int getApplicationId() {
         return applicationId;
+    }
+
+    @Override
+    public String getColor() {
+        Optional<ApplicationEntity> app = ApplicationEntity.findById(this.applicationId);
+
+        String color;
+        if (app.isPresent())
+            color = app.get().color;
+        else {
+            System.err.println("Application not found, setting color as #FFFFFF");
+            color = "#FFFFFF";
+        }
+
+        return color;
     }
 
 

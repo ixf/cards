@@ -8,14 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BackgroundPeriodEntity {
+public class BackgroundPeriodEntity extends Period {
 
     public static final String TABLE_NAME = "background_period";
 
-    private final int id;
-    private final String startTime;
-    private final String endTime;
-    private final int applicationId;
+    protected int applicationId;
 
     public BackgroundPeriodEntity(final int id, final String startTime, final String endTime, final int applicationId) {
         this.id = id;
@@ -130,17 +127,14 @@ public class BackgroundPeriodEntity {
         return Optional.empty();
     }
 
-    public int getId() {
-        return id;
-    }
-    public String getStartTime() {
-        return startTime;
-    }
-    public String getEndTime() {
-        return endTime;
-    }
+
     public int getApplicationId() {
         return applicationId;
+    }
+    @Override
+    public String getColor() {
+        // grey color
+        return "#A9A9A9";
     }
 
 

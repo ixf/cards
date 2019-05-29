@@ -8,13 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ComputerRunningPeriodEntity {
+public class ComputerRunningPeriodEntity extends Period {
 
     public static final String TABLE_NAME = "computer_running_period";
-
-    private final int id;
-    private final String startTime;
-    private final String endTime;
 
     public ComputerRunningPeriodEntity(final int id, final String startTime, final String endTime) {
         this.id = id;
@@ -118,17 +114,6 @@ public class ComputerRunningPeriodEntity {
         return Optional.empty();
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -139,6 +124,12 @@ public class ComputerRunningPeriodEntity {
         }
 
         return super.equals(obj);
+    }
+
+    @Override
+    public String getColor() {
+        // black color
+        return "#FFFFFF";
     }
 
     public static class Columns {
