@@ -15,16 +15,16 @@ public class ApplicationEntity {
     private final int id;
     private final String name;
     private final String applicationPath;
-    private final int color;
+    private final String color;
 
-    private ApplicationEntity(final int id, final String name, final String applicationPath, final int color) {
+    private ApplicationEntity(final int id, final String name, final String applicationPath, final String color) {
         this.id = id;
         this.name = name;
         this.applicationPath = applicationPath;
         this.color = color;
     }
 
-    public static Optional<ApplicationEntity> create(final String name, final String applicationPath, final int color) {
+    public static Optional<ApplicationEntity> create(final String name, final String applicationPath, final String color) {
         String insertSql = String.format(
                 "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', %d)"
                 , TABLE_NAME, Columns.NAME, Columns.APPLICATION_PATH, Columns.COLOR
@@ -42,7 +42,7 @@ public class ApplicationEntity {
         return ApplicationEntity.findById(id);
     }
 
-    public static void updateApplicationColor(final String name, final int color){
+    public static void updateApplicationColor(final String name, final String color){
 
         String updateSql = String.format(
                 "UPDATE %s SET %s = %d WHERE %s = %s",
@@ -104,7 +104,7 @@ public class ApplicationEntity {
                     rs.getInt(Columns.ID),
                     rs.getString(Columns.NAME),
                     rs.getString(Columns.APPLICATION_PATH),
-                    rs.getInt(Columns.COLOR)
+                    rs.getString(Columns.COLOR)
             ));
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,7 +157,7 @@ public class ApplicationEntity {
         return applicationPath;
     }
 
-    public int getColor() {
+    public String getColor() {
         return color;
     }
 
