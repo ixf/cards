@@ -77,7 +77,7 @@ public class MainViewController {
     private Button generate_report;
 
     @FXML
-    private ImageView menuBar;
+    private ImageView settingsButton;
 
     @FXML
     public void initialize(){
@@ -169,7 +169,7 @@ public class MainViewController {
     }
 
     @FXML
-    public void handleMenuBar(MouseEvent event){
+    public void handleSettingsButton(MouseEvent event){
 
     }
 
