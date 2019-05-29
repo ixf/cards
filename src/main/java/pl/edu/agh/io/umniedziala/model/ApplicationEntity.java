@@ -27,7 +27,7 @@ public class ApplicationEntity {
 
     public static Optional<ApplicationEntity> create(final String name, final String applicationPath, final String color) {
         String insertSql = String.format(
-                "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', %s)"
+                "INSERT INTO %s (%s, %s, %s) VALUES ('%s', '%s', '%s')"
                 , TABLE_NAME, Columns.NAME, Columns.APPLICATION_PATH, Columns.COLOR
                 , name, applicationPath, color
         );
