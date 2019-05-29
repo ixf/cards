@@ -4,6 +4,7 @@ import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +13,10 @@ public class ApplicationEntity {
 
     public static final String TABLE_NAME = "application";
 
-    private final int id;
-    private final String name;
-    private final String applicationPath;
-    private final String color;
+    protected int id;
+    protected String name;
+    protected String applicationPath;
+    protected String color;
 
     private ApplicationEntity(final int id, final String name, final String applicationPath, final String color) {
         this.id = id;
@@ -95,6 +96,27 @@ public class ApplicationEntity {
         }
 
         return Optional.empty();
+    }
+
+    public static List<ApplicationEntity> getAllApplications() {
+        String getAllApplicationsSql = String.format("SELECT * FROM " + TABLE_NAME);
+
+        List<ApplicationEntity> resultList = new ArrayList<>();
+        try {
+            ResultSet rs = QuerryExecutor.read(getAllApplicationsSql);
+            while (rs.next()) {
+                resultList.add(new ApplicationEntity(
+                        rs.getInt(Columns.ID)
+                        , rs.getString(Columns.NAME)
+                        , rs.getString(Columns.APPLICATION_PATH)
+                        , rs.getString(Columns.COLOR)
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultList;
     }
 
 
