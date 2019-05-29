@@ -10,6 +10,7 @@ import pl.edu.agh.io.umniedziala.model.BackgroundPeriodEntity;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.monitors.activeApplicationMonitor.ActiveWindowNotFound;
 
+import java.io.OptionalDataException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -22,7 +23,8 @@ public class BackgroundApplicationsMonitor extends Thread {
 
     private List<ApplicationEntity> applicationEntityList;
 
-    private HashMap<Integer, String> startTimeList = new HashMap<>(); //temporary
+                    //app_id : back_id
+    private HashMap<Integer, Integer> entitiesMap = new HashMap<>(); //temporary
 
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -64,11 +66,13 @@ public class BackgroundApplicationsMonitor extends Thread {
     }
 
     private void initValues(){
+
+        applicationEntityList = ApplicationEntity.getAllApplications();
+
         for(ApplicationEntity applicationEntity : applicationEntityList){
             String start = dateFormat.format(new Date());
-            startTimeList.put(applicationEntity.getId(),start);
-            BackgroundPeriodEntity.create(start,start,applicationEntity.getId());
-
+            int id = BackgroundPeriodEntity.create(start,start,applicationEntity.getId()).get().getId();
+            entitiesMap.put(applicationEntity.getId(), id);
         }
     }
 
@@ -88,8 +92,11 @@ public class BackgroundApplicationsMonitor extends Thread {
 
             for(ApplicationEntity applicationEntity : applicationEntityList){
                 int id = applicationEntity.getId();
-                if(BackgroundPeriodEntity.findById(applicationEntity.getId()).isPresent()){
-                    BackgroundPeriodEntity.update(id,startTimeList.get(id),dateFormat.format(new Date()));
+
+                if(BackgroundPeriodEntity.findById(entitiesMap.get(id)).isPresent()){
+
+                    BackgroundPeriodEntity.update(entitiesMap.get(id), BackgroundPeriodEntity.findById(entitiesMap.get(id)).get().getStartTime(), dateFormat.format(new Date()));
+
                 } else {
                     String start = dateFormat.format(new Date());
                     BackgroundPeriodEntity.create(start,start,id);
@@ -105,5 +112,5 @@ public class BackgroundApplicationsMonitor extends Thread {
         }
 
     }
- 
+
 }
