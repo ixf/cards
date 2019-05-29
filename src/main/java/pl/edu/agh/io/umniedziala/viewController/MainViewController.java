@@ -35,6 +35,8 @@ public class MainViewController {
     ManagingApplicationsController managingApplicationsController;
     final static int DEFAULT_COLOR = 0;
 
+    private Date currentDate;
+
     @FXML
     private Label activity;
 
@@ -88,14 +90,14 @@ public class MainViewController {
 
     @FXML
     public void initialize(){
-        Date current_date = new Date();
-        date.setText(dateFormat.format(current_date));
+        currentDate = new Date();
+        date.setText(dateFormat.format(currentDate));
         managingApplicationsController = new ManagingApplicationsController();
 
-        startTimechartUpdates(current_date);
+        startTimechartUpdates();
     }
 
-    private void startTimechartUpdates(Date current_date) {
+    private void startTimechartUpdates() {
         // Nasz timechart jest szeroki a bazę aktualizujemy często. Nie ma chyba potrzeby, żeby aktualizować
         // wykresy przy każdej zmianie w bazie. Uruchamiam tutaj timer, który co kilka minut aktualizuje wykres.
 
@@ -107,7 +109,7 @@ public class MainViewController {
                 Platform.runLater(() ->{
                     try {
                         addTrackedAppsToTimechart();
-                        loadExistingDataToTimechart(current_date);
+                        loadExistingDataToTimechart(currentDate);
                     } catch (SQLException e) {
                         // TODO jakiś ładny alert
                         e.printStackTrace();
@@ -133,27 +135,29 @@ public class MainViewController {
     }
 
     @FXML
-    public void handle_left_date(MouseEvent event) throws ParseException {
-        String date_text = date.getText();
-        Date curr_date = dateFormat.parse(date_text);
+    public void handle_left_date(MouseEvent event) throws ParseException, SQLException {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(curr_date);
+        cal.setTime(currentDate);
         cal.add(Calendar.DATE,-1);
-        date.setText(dateFormat.format(cal.getTime()));
+        currentDate.setTime(cal.getTimeInMillis());
+
+        date.setText(dateFormat.format(currentDate.getTime()));
+        loadExistingDataToTimechart(new Date(cal.getTimeInMillis()));
     }
 
     @FXML
-    public void handle_right_date(MouseEvent event) throws ParseException {
-        String date_text = date.getText();
-        Date curr_date = dateFormat.parse(date_text);
+    public void handle_right_date(MouseEvent event) throws ParseException, SQLException {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(curr_date);
+        cal.setTime(currentDate);
         Date today = new Date();
         String today_text = dateFormat.format(today);
         today = dateFormat.parse(today_text);
-        if (curr_date.compareTo(today) < 0 ) {
+        if (currentDate.compareTo(today) < 0 ) {
             cal.add(Calendar.DATE, 1);
-            date.setText(dateFormat.format(cal.getTime()));
+            currentDate.setTime(cal.getTimeInMillis());
+            date.setText(dateFormat.format(currentDate.getTime()));
+
+            loadExistingDataToTimechart(new Date(cal.getTimeInMillis()));
         }
     }
 
