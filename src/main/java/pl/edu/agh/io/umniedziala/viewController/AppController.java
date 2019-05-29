@@ -44,20 +44,19 @@ public class AppController {
     private void closeWindowEvent(WindowEvent event) {
         System.out.println("Window close request ...");
         //TODO: tu obsługa wydarzeń przed zamknięciem apki
+        System.exit(0);
     }
 
     public void showReportGenerationWindow(){
         try {
-            // Load the fxml file and create a new stage for the dialog
             FXMLLoader loader = new FXMLLoader();
 
             Parent page = loader.load(getClass().getResourceAsStream("/views/ReportGenerationView.fxml"));
 
-            // Create the dialog Stage.
             Stage reportStage = new Stage();
             reportStage.setTitle("Report Generation");
-            reportStage.initModality(Modality.WINDOW_MODAL);
             reportStage.setResizable(false);
+
             Scene scene = new Scene(page);
             reportStage.setScene(scene);
 
@@ -66,6 +65,31 @@ public class AppController {
             controller.setStage(reportStage);
             reportStage.show();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void showSettingsWindow(){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+
+            Parent page = loader.load(getClass().getResourceAsStream("/views/SettingsView.fxml"));
+
+            Stage settingsStage = new Stage();
+            settingsStage.setTitle("Settings");
+            settingsStage.setResizable(false);
+
+            Scene scene = new Scene(page);
+            settingsStage.setScene(scene);
+
+            SettingsViewController controller = loader.getController();
+            controller.setAppController(this);
+            controller.setStage(settingsStage);
+            controller.loadData();
+            settingsStage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +107,6 @@ public class AppController {
             // Create the dialog Stage.
             Stage eventStage = new Stage();
             eventStage.setTitle("Custom event");
-            eventStage.initModality(Modality.WINDOW_MODAL);
             eventStage.setResizable(false);
             Scene scene = new Scene(page);
             eventStage.setScene(scene);

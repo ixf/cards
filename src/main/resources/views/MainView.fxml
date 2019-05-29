@@ -16,9 +16,9 @@
 
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import pl.edu.agh.io.umniedziala.view.TimeChart?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import pl.edu.agh.io.umniedziala.view.TimeChart?>
 <AnchorPane prefHeight="459.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.192" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.MainViewController">
    <children>
       <BorderPane prefHeight="459.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -101,14 +101,14 @@
             </BorderPane>
          </top>
          <center>
-            <TimeChart minHeight="300" minWidth="300" fx:id="activity_chart">
-               <xAxis>
-                  <NumberAxis fx:id="time_axis" autoRanging="false" />
-               </xAxis>
-               <yAxis>
-                  <CategoryAxis fx:id="app_axis" />
-               </yAxis>
-            </TimeChart>
+             <TimeChart minHeight="300" minWidth="300" fx:id="activity_chart">
+                 <xAxis>
+                     <NumberAxis fx:id="time_axis" autoRanging="false" />
+                 </xAxis>
+                 <yAxis>
+                     <CategoryAxis fx:id="app_axis" />
+                 </yAxis>
+             </TimeChart>
          </center></BorderPane>
    </children>
 </AnchorPane>

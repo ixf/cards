@@ -4,10 +4,7 @@ import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ApplicationEntity {
 
@@ -83,6 +80,20 @@ public class ApplicationEntity {
         }
 
         return Optional.empty();
+    }
+
+    public static Map<String, String> getApplicationsColors(){
+        String getApplicationsColorsSQL = String.format("SELECT name, color FROM %s",TABLE_NAME);
+        Map<String, String> results = new HashMap<>();
+        try {
+            ResultSet rs = QuerryExecutor.read(getApplicationsColorsSQL);
+            while (rs.next()){
+                results.put(rs.getString(Columns.NAME), rs.getString(Columns.COLOR));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
     }
 
 

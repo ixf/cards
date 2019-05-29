@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="267.0" maxWidth="325.0" minHeight="250.0" minWidth="267.0" prefHeight="267.0" prefWidth="267.0" scaleShape="false" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.ReportGenerationViewController">
+<AnchorPane maxHeight="267.0" maxWidth="267.0" minHeight="250.0" minWidth="267.0" prefHeight="267.0" prefWidth="267.0" scaleShape="false" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.edu.agh.io.umniedziala.viewController.ReportGenerationViewController">
    <children>
       <Label layoutX="19.0" layoutY="44.0" text="Choose dates">
          <font>
