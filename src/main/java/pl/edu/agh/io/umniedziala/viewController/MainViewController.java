@@ -132,7 +132,7 @@ public class MainViewController {
         String sDate = sdf.format(date);
         List<Period> results = QuerryExecutor.getPeriodsForDay(date);
         results.addAll(ComputerRunningPeriodEntity.findByStartDate(sDate));
-        results.addAll(CustomEventEntity.findByName(sDate));
+        results.addAll(CustomEventEntity.findByStartDate(sDate));
         activity_chart.setDataByResults(results);
     }
 

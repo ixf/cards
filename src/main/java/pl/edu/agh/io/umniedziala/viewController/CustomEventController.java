@@ -3,9 +3,14 @@ package pl.edu.agh.io.umniedziala.viewController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import pl.edu.agh.io.umniedziala.model.CustomEventEntity;
 import pl.edu.agh.io.umniedziala.view.DateTimePicker;
+import sun.java2d.pipe.SpanShapeRenderer;
+
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 public class CustomEventController {
 
@@ -68,12 +73,19 @@ public class CustomEventController {
     }
 
     @FXML
-    public void handleSaveButton(ActionEvent event){
-        if (nameInserted && startTimeInserted && endTimeInserted){
-            CustomEventEntity.create(startTime.getDateTimeValue().toString(),endTime.getDateTimeValue().toString(),
-                    nameInput.getText(), descriptionInput.getText(),colorPicker.getValue().toString());
+    public void handleSaveButton(ActionEvent event) {
+        if (nameInserted && startTimeInserted && endTimeInserted) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String start = startTime.getDateTimeValue().format(formatter);
+            String end = endTime.getDateTimeValue().format(formatter);
+            Color color = colorPicker.getValue();
+            String resultColor = String.format("#%02X%02X%02X",
+                    ((int)color.getRed())*255,
+                    ((int)color.getGreen())*255,
+                    ((int)color.getBlue())*255);
+            CustomEventEntity.create(start, end, nameInput.getText(), descriptionInput.getText(), resultColor);
             stage.close();
-        } else{
+        } else {
             alert.setText("Choose start time, end time and name!");
         }
     }
