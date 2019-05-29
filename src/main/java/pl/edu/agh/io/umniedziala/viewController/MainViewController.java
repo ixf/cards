@@ -18,8 +18,12 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pl.edu.agh.io.umniedziala.databaseUtilities.QuerryExecutor;
+import pl.edu.agh.io.umniedziala.model.ComputerRunningPeriodEntity;
+import pl.edu.agh.io.umniedziala.model.CustomEventEntity;
+import pl.edu.agh.io.umniedziala.model.Period;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 import pl.edu.agh.io.umniedziala.view.TimeChart;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -89,7 +93,7 @@ public class MainViewController {
     private MenuItem eventButton;
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         currentDate = new Date();
         date.setText(dateFormat.format(currentDate));
         managingApplicationsController = new ManagingApplicationsController();
@@ -106,7 +110,7 @@ public class MainViewController {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(() ->{
+                Platform.runLater(() -> {
                     try {
                         addTrackedAppsToTimechart();
                         loadExistingDataToTimechart(currentDate);
@@ -124,12 +128,17 @@ public class MainViewController {
     }
 
     private void loadExistingDataToTimechart(Date date) throws SQLException {
-        List<RunningPeriodEntity> results = QuerryExecutor.getPeriodsForDay(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String sDate = sdf.format(date);
+        List<Period> results = QuerryExecutor.getPeriodsForDay(date);
+        results.addAll(ComputerRunningPeriodEntity.findByStartDate(sDate));
+        results.addAll(CustomEventEntity.findByName(sDate));
         activity_chart.setDataByResults(results);
     }
 
     public void addTrackedAppsToTimechart() throws SQLException {
         Map<Integer, String> appNames = QuerryExecutor.getAppNames();
+        appNames.put(0, "ACTIVITY");
         app_axis.setCategories(FXCollections.observableArrayList(appNames.values()));
         activity_chart.setAppNames(appNames);
     }
@@ -138,7 +147,7 @@ public class MainViewController {
     public void handle_left_date(MouseEvent event) throws ParseException, SQLException {
         Calendar cal = Calendar.getInstance();
         cal.setTime(currentDate);
-        cal.add(Calendar.DATE,-1);
+        cal.add(Calendar.DATE, -1);
         currentDate.setTime(cal.getTimeInMillis());
 
         date.setText(dateFormat.format(currentDate.getTime()));
@@ -152,7 +161,7 @@ public class MainViewController {
         Date today = new Date();
         String today_text = dateFormat.format(today);
         today = dateFormat.parse(today_text);
-        if (currentDate.compareTo(today) < 0 ) {
+        if (currentDate.compareTo(today) < 0) {
             cal.add(Calendar.DATE, 1);
             currentDate.setTime(cal.getTimeInMillis());
             date.setText(dateFormat.format(currentDate.getTime()));
@@ -165,32 +174,32 @@ public class MainViewController {
     public void handleAppButton(ActionEvent event) {
         List<File> list =
                 fileChooser.showOpenMultipleDialog(new Stage());
-        if (list != null){
+        if (list != null) {
             if (!list.isEmpty()) {
                 for (File file : list) {
-                    managingApplicationsController.addNewApplicationByPath(file.getAbsolutePath(),DEFAULT_COLOR);
+                    managingApplicationsController.addNewApplicationByPath(file.getAbsolutePath(), DEFAULT_COLOR);
                 }
             }
         }
     }
 
     @FXML
-    public void handleReportButton(ActionEvent event){
+    public void handleReportButton(ActionEvent event) {
         appController.showReportGenerationWindow();
     }
 
     @FXML
-    public void handleSettingsButton(ActionEvent event){
+    public void handleSettingsButton(ActionEvent event) {
 
     }
 
     @FXML
-    public void handleMenuButton(MouseEvent event){
+    public void handleMenuButton(MouseEvent event) {
         menuButton.show();
     }
 
     @FXML
-    public void handleEventButton(ActionEvent event){
+    public void handleEventButton(ActionEvent event) {
         appController.showCustomEventView();
     }
 

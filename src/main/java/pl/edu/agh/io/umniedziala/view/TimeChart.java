@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
+import pl.edu.agh.io.umniedziala.model.Period;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 
 import java.text.ParseException;
@@ -33,19 +34,19 @@ public class TimeChart extends XYChart<Number, String> {
     public static class ExtraData {
 
         private double length;
-        private Color style;
+        private String style;
 
-        public ExtraData(double length, Color style) {
+        public ExtraData(double length, String style) {
             super();
             this.length = length;
             this.style = style;
         }
 
-        public Color getStyle() {
+        public String getStyle() {
             return style;
         }
 
-        public void setStyle(Color style) {
+        public void setStyle(String style) {
             this.style = style;
         }
 
@@ -108,19 +109,23 @@ public class TimeChart extends XYChart<Number, String> {
         });
     }
 
+    private XYChart.Series addNewApp(Integer id, String name) {
+        XYChart.Series series = new XYChart.Series();
+        series.setName(name);
+        seriesMap.put(id, series);
+        getData().add(series);
+        return series;
+    }
+
     public void setAppNames(Map<Integer, String> appNames) {
         getData().clear();
         this.appNames = appNames;
         for (Map.Entry<Integer, String> ent : appNames.entrySet()) {
-            XYChart.Series series = new XYChart.Series();
-            series.setName(ent.getValue());
-            seriesMap.put(ent.getKey(), series);
-
-            getData().add(series);
+            addNewApp(ent.getKey(), ent.getValue());
         }
     }
 
-    public void setDataByResults(List<RunningPeriodEntity> results) {
+    public void setDataByResults(List<Period> results) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -128,8 +133,11 @@ public class TimeChart extends XYChart<Number, String> {
             series.getData().clear();
         }
 
-        for (RunningPeriodEntity ent : results) {
-            XYChart.Series series = seriesMap.get(ent.getApplicationId());
+        for (Period ent : results) {
+            int seriesId = 0;
+            if(ent instanceof RunningPeriodEntity)
+                seriesId = ((RunningPeriodEntity) ent).getApplicationId();
+            XYChart.Series series = seriesMap.get(seriesId);
             Double start = 0.0;
             Double length = 1.0;
             try {
@@ -141,8 +149,8 @@ public class TimeChart extends XYChart<Number, String> {
             }
             start /= 3600.0;
             length /= 3600.0;
-            String appName = appNames.get(ent.getApplicationId());
-            series.getData().add(new XYChart.Data<Number, String>(start, appName, new ExtraData(length, Color.RED)));
+            String appName = appNames.get(seriesId);
+            series.getData().add(new XYChart.Data<Number, String>(start, appName, new ExtraData(length, ent.getColor())));
         }
     }
 
@@ -236,15 +244,15 @@ public class TimeChart extends XYChart<Number, String> {
         }
 
         // TODO: nie wybierania kolorów jeszcze. Wszystko jest różowe
+        String style = ((ExtraData) item.getExtraValue()).getStyle();
         /*
-        Color style = ((ExtraData) item.getExtraValue()).getStyle();
         int red = (int) (style.getRed() * 255);
         int green = (int) (style.getGreen() * 255);
         int blue = (int) (style.getBlue() * 255);
         String cssValue = String.format("-fx-background-color: rgba(%d, %d, %d, %f)", red, green, blue, style.getOpacity());
          */
 
-        String cssValue = "-fx-background-color: rgba(255, 105, 180, 1.0)";
+        String cssValue = "-fx-background-color: " + style;
         container.setStyle(cssValue);
 
         return container;
