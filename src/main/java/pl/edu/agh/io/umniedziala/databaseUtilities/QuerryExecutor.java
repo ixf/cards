@@ -1,5 +1,6 @@
 package pl.edu.agh.io.umniedziala.databaseUtilities;
 
+import pl.edu.agh.io.umniedziala.model.Period;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 
 import java.sql.PreparedStatement;
@@ -49,7 +50,7 @@ public class QuerryExecutor {
         return names;
     }
 
-    public static List<RunningPeriodEntity> getPeriodsForDay(java.util.Date date) throws SQLException {
+    public static List<Period> getPeriodsForDay(java.util.Date date) throws SQLException {
         LocalDate today = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         java.sql.Date dateAtStart = java.sql.Date.valueOf(today);
         java.sql.Date dateAtEnd = java.sql.Date.valueOf(today.plusDays(1));
@@ -63,7 +64,7 @@ public class QuerryExecutor {
 
             resultSet = statement.executeQuery();
 
-            List<RunningPeriodEntity> periods = new ArrayList<>();
+            List<Period> periods = new ArrayList<>();
             while (resultSet.next()) {
                 RunningPeriodEntity period = RunningPeriodEntity.returnRunningPeriod(resultSet).orElseThrow(() -> new RuntimeException("Couldn't read RunningPeriodEntity from resultSet"));
                 periods.add( period );
