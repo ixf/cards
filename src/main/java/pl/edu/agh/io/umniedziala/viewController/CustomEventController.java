@@ -80,9 +80,9 @@ public class CustomEventController {
             String end = endTime.getDateTimeValue().format(formatter);
             Color color = colorPicker.getValue();
             String resultColor = String.format("#%02X%02X%02X",
-                    ((int)color.getRed())*255,
-                    ((int)color.getGreen())*255,
-                    ((int)color.getBlue())*255);
+                    (int)(color.getRed()*255),
+                    (int)(color.getGreen()*255),
+                    (int)(color.getBlue()*255));
             CustomEventEntity.create(start, end, nameInput.getText(), descriptionInput.getText(), resultColor);
             stage.close();
         } else {

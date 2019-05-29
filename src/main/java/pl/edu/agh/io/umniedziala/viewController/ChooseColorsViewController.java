@@ -83,9 +83,9 @@ public class ChooseColorsViewController {
             return;
         Color color = colorPicker.getValue();
         String newColor = String.format("#%02X%02X%02X",
-                ((int)color.getRed())*255,
-                ((int)color.getGreen())*255,
-                ((int)color.getBlue())*255);
+                (int)(color.getRed()*255),
+                (int)(color.getGreen()*255),
+                (int)(color.getBlue()*255));
         ApplicationEntity.updateApplicationColor(changedApp.getName(), newColor);
         changedApp.color = newColor;
     }
