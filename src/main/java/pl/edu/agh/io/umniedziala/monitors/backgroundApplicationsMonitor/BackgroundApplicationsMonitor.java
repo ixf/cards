@@ -84,8 +84,17 @@ public class BackgroundApplicationsMonitor extends Thread {
 
             applicationEntityList = ApplicationEntity.getAllApplications();
 
+            for(ApplicationEntity applicationEntity : applicationEntityList){
+                int id = applicationEntity.getId();
+
+                if(RunningPeriodEntity.findById(entitiesMap.get(id)).isPresent()){
+                    int appId = RunningPeriodEntity.findById(entitiesMap.get(id)).get().getApplicationId();
+                    applicationEntityList.remove(ApplicationEntity.findById(appId));
+                }
+            }
+
             try {
-                applicationEntityList.remove(getCurrentActiveWindowName());
+                applicationEntityList.remove(ApplicationEntity.findByName(getCurrentActiveWindowName()));
             } catch (ActiveWindowNotFound activeWindowNotFound) {
                 activeWindowNotFound.printStackTrace();
             }
