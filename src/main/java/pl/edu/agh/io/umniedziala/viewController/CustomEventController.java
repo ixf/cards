@@ -57,10 +57,6 @@ public class CustomEventController {
         endTimeInserted=false;
     }
 
-    @FXML
-    public void nameInputHandler(ActionEvent event){
-        nameInserted=true;
-    }
 
     @FXML
     public void startTimeHandler(ActionEvent event){
@@ -74,6 +70,7 @@ public class CustomEventController {
 
     @FXML
     public void handleSaveButton(ActionEvent event) {
+        nameInserted = !nameInput.getText().isEmpty();
         if (nameInserted && startTimeInserted && endTimeInserted) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String start = startTime.getDateTimeValue().format(formatter);
