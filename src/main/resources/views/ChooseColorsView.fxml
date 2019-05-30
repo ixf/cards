@@ -28,7 +28,8 @@
          <center>
             <TableView fx:id="appColorsTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <columns>
-                <TableColumn fx:id="applicationColumn" prefWidth="75.0" text="Application" />
+                 <TableColumn fx:id="iconColumn" maxWidth="300.0"/>
+                 <TableColumn fx:id="applicationColumn" prefWidth="75.0" text="Application" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
