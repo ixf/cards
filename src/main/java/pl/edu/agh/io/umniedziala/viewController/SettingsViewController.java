@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import pl.edu.agh.io.umniedziala.configuration.Configuration;
 
 import java.io.IOException;
 
@@ -22,8 +23,8 @@ public class SettingsViewController {
     private Stage stage;
     private Stage colorsStage;
 
-    private Long checkInterval = 0L;
-    private Long activityTime = 0L;
+    private Long checkInterval;
+    private Long activityTime;
     private int chartStart;
     private int chartEnd;
 
@@ -52,11 +53,12 @@ public class SettingsViewController {
     }
 
     public void loadData(){
-        /*chartStart = Configuration.getInstance().getChartStart().intValue();
-        chartEnd = Configuration.getInstance().getChartEnd().intValue();*/
+        chartStart = Configuration.getInstance().getChartStart().intValue();
+        chartEnd = Configuration.getInstance().getChartEnd().intValue();
 
-        chartStart = 1;
-        chartEnd = 2;
+        checkInterval = Configuration.getInstance().getCheckInterval();
+        activityTime = Configuration.getInstance().getInactivityPeriod();
+
         chartStartField.setText(Integer.toString(chartStart));
         chartEndField.setText(Integer.toString(chartEnd));
         computerActivityField.setText(Long.toString(activityTime));
@@ -66,7 +68,7 @@ public class SettingsViewController {
     public void handleSave(ActionEvent event) {
         try {
             chartStart = Integer.parseInt(chartStartField.getText());
-            chartEnd = Integer.parseInt(chartStartField.getText());
+            chartEnd = Integer.parseInt(chartEndField.getText());
 
             checkInterval = Long.parseLong(applicationActivityField.getText());
             activityTime = Long.parseLong(computerActivityField.getText());
@@ -75,7 +77,11 @@ public class SettingsViewController {
                 colorsStage.close();
             }
 
-            //TODO: zapisać konfiguracje
+            Configuration.getInstance().setChartStart((long) chartStart);
+            Configuration.getInstance().setChartEnd((long) chartEnd);
+
+            Configuration.getInstance().setCheckInterval(checkInterval);
+            Configuration.getInstance().setInactivityPeriod(activityTime);
 
             stage.close();
         } catch (NumberFormatException e){

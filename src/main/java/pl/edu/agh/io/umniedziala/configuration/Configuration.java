@@ -75,7 +75,6 @@ public class Configuration {
         Toml config = GeneralConfigurationManager.getInstance().config();
 
         Map<String, Object> map = config.toMap();
-        map.put("monitor.inactivity_period", checkInterval);
 
         ((HashMap<String, Object>)map.get("monitor")).put("inactivity_period", inactivityPeriod);
 
