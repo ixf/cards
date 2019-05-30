@@ -9,6 +9,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.util.StringConverter;
 import pl.edu.agh.io.umniedziala.configuration.Configuration;
 import pl.edu.agh.io.umniedziala.model.Period;
@@ -73,6 +74,9 @@ public class TimeChart extends XYChart<Number, String> {
         timeAxis.setUpperBound(maxHour);
         timeAxis.setTickUnit(1.0);
 
+        timeAxis.setTickLabelFont(Font.font(14));
+        appAxis.setTickLabelFont(Font.font(16));
+
         timeAxis.setTickLabelFormatter(new StringConverter<Number>() {
             @Override
             public String toString(Number object) {
@@ -126,6 +130,10 @@ public class TimeChart extends XYChart<Number, String> {
             addNewApp(ent.getKey(), ent.getValue());
         }
         lineHeight = getYAxis().getHeight() / (appNames.size()+1);
+
+        getYAxis().setVisible(false);
+        getYAxis().setVisible(true);
+        getYAxis().setAutoRanging(true);
     }
 
     public void setDataByResults(List<Period> results) {

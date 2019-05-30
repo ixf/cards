@@ -109,7 +109,7 @@
                   <NumberAxis fx:id="time_axis" autoRanging="false" />
                </xAxis>
                <yAxis>
-                  <CategoryAxis fx:id="app_axis" />
+                  <CategoryAxis fx:id="app_axis" animated="false" />
                </yAxis>
             </TimeChart>
          </center></BorderPane>
