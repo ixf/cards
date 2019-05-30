@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
+import pl.edu.agh.io.umniedziala.configuration.Configuration;
 import pl.edu.agh.io.umniedziala.model.Period;
 import pl.edu.agh.io.umniedziala.model.RunningPeriodEntity;
 
@@ -20,12 +21,10 @@ import java.util.*;
 public class TimeChart extends XYChart<Number, String> {
 
     // granice w których wyświetlamy wyrkes
-    // może to się będzie jakoś ustawiać a może zoomować/przesuwać wykres i będzie zbędne
-    private static final int minHour = 8;
-    private static final int maxHour = 24;
+    private int minHour;
+    private int maxHour;
 
-    // powinno się dynamicznie zmieniać może? TODO
-    private static final double lineHeight = 80.0;
+    private double lineHeight = 60.0;
 
     // YAxis zawiera stringi: TODO zamienić to na inty i formatować na stringi korzystając z appNames
     private Map<Integer, String> appNames;
@@ -62,6 +61,9 @@ public class TimeChart extends XYChart<Number, String> {
     public TimeChart(@NamedArg("xAxis") NumberAxis timeAxis,
                      @NamedArg("yAxis") CategoryAxis appAxis) {
         super(timeAxis, appAxis);
+        Configuration config = Configuration.getInstance();
+        minHour = Math.toIntExact(config.getChartStart());
+        maxHour = Math.toIntExact(config.getChartEnd());
         setData(FXCollections.observableArrayList());
         timeAxis.setLowerBound(minHour);
         setLegendVisible(false);
@@ -123,6 +125,7 @@ public class TimeChart extends XYChart<Number, String> {
         for (Map.Entry<Integer, String> ent : appNames.entrySet()) {
             addNewApp(ent.getKey(), ent.getValue());
         }
+        lineHeight = getYAxis().getHeight() / (appNames.size()+1);
     }
 
     public void setDataByResults(List<Period> results) {
