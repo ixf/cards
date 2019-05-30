@@ -129,7 +129,7 @@ public class ComputerRunningPeriodEntity extends Period {
     @Override
     public String getColor() {
         // black color
-        return "#FFFFFF";
+        return "#000000";
     }
 
     public static class Columns {
