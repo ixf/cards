@@ -40,17 +40,7 @@ public class GeneralConfigurationManager {
     }
 
     private Toml getDefaultConfiguration() {
-        URL defaultConfigFileUrl = Objects.requireNonNull(
-                getClass().getClassLoader().getResource(DEFAULT_CONFIGURATION_PATH)
-        );
-
-        File defaultConfigFile = new File(defaultConfigFileUrl.getFile());
-
-        if (!defaultConfigFile.exists()) {
-            throw new ConfigurationException("Default Configuration File does not exists!");
-        }
-
-        return new Toml().read(defaultConfigFile);
+        return new Toml().read(getClass().getClassLoader().getResourceAsStream(DEFAULT_CONFIGURATION_PATH));
     }
 
     public void resetToDefaults() {
