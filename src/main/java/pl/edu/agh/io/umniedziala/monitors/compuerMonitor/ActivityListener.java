@@ -131,6 +131,12 @@ public class ActivityListener extends Thread implements NativeMouseInputListener
                         break;
                     }
 
+                    try{
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex){
+                        ex.printStackTrace();
+                    }
+
                 }
             }
 
