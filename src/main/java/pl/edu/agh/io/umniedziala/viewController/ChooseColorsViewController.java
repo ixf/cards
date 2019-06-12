@@ -142,7 +142,7 @@ public class ChooseColorsViewController {
                 BufferedImage bi = new BufferedImage(
                         swingImageIcon.getIconWidth(),
                         swingImageIcon.getIconHeight(),
-                        BufferedImage.TYPE_INT_RGB);
+                        BufferedImage.TYPE_INT_ARGB);
                 Graphics g = bi.createGraphics();
                 swingImageIcon.paintIcon(null, g, 0, 0);
                 g.dispose();
